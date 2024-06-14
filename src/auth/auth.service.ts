@@ -25,44 +25,42 @@ export class AuthService {
   ) {}
 
   // //   login
-  // async login(loginData: loginDto): Promise<any> {
-  //   const existingUser = await this.prisma.user.findUnique({
-  //     where: {
-  //       email: loginData.email.toLowerCase(),
-  //     },
-  //   });
+  async login(loginData: loginDto): Promise<any> {
+    const existingUser = await this.knex('users')
+      .where({
+        email: loginData.email,
+      })
+      .first();
 
-  //   if (!existingUser) {
-  //     throw new NotFoundException('Email is invalid');
-  //   }
+    if (!existingUser) {
+      throw new NotFoundException('Email is invalid');
+    }
 
-  //   const passwordMatch = await bcrypt.compare(
-  //     loginData.password,
-  //     existingUser.password,
-  //   );
+    const passwordMatch = await bcrypt.compare(
+      loginData.password,
+      existingUser.password,
+    );
 
-  //   if (!passwordMatch) {
-  //     throw new HttpException('password incorrect', HttpStatus.UNAUTHORIZED);
-  //   }
+    if (!passwordMatch) {
+      throw new HttpException('password incorrect', HttpStatus.UNAUTHORIZED);
+    }
 
-  //   if (!existingUser.emailConfirmed) {
-  //     // this.generateAndSendToken(loginData.email);
+    const access_token = await this.jwtService.signAsync({ ...existingUser });
 
-  //     throw new HttpException('email not confirmed', HttpStatus.UNAUTHORIZED);
-  //   }
+    const { password, ...rest } = existingUser;
 
-  //   const access_token = this.jwtService.signAsync(existingUser);
-
-  //   const { password, ...rest } = existingUser;
-
-  //   return { access_token, data: rest };
-  // }
+    return { access_token, data: rest };
+  }
 
   //   register
   async register(createUserData: RegisterDto): Promise<any> {
-    const existingUser = await this.knex('users').where({
-      email: createUserData.email,
-    });
+    const existingUser = await this.knex('users')
+      .where({
+        email: createUserData.email,
+      })
+      .first();
+
+    console.log({ existingUser });
 
     if (existingUser) {
       throw new BadRequestException('Email already registered');
@@ -79,17 +77,21 @@ export class AuthService {
       api_key = this.generateUniqueApiKey();
     }
 
-    const newUser = await this.knex('users').insert({
-      email,
-      password: hashedPassword,
-      ...data,
-      api_key,
-    });
+    const [userId] = await this.knex('users')
+      .insert({
+        email,
+        password: hashedPassword,
+        api_key,
+        ...data,
+      })
+      .returning('id'); // 'returning' ensures the ID is returned
+
+    const newUser = await this.knex('users').where('id', userId).first();
 
     // await this.generateAndSendToken(newUser.email);
 
     return {
-      message: 'registration successful check email to confirm!',
+      message: 'registration successful!',
       user: newUser,
     };
   }
@@ -100,10 +102,9 @@ export class AuthService {
   }
 
   private async apiKeyExists(api_key: string): Promise<boolean> {
-    const user = await this.knex('users').where({
-      api_key,
-    });
-    return !!user;
+    const user = await this.knex('users').where({ api_key }).first();
+
+    return !!user; // This will return true if user is found, false otherwise
   }
 
   // private async generateAndSendToken(email: string) {
