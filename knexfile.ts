@@ -1,18 +1,21 @@
 import type { Knex } from 'knex';
-import { deflate } from 'zlib';
 
 // Update with your config settings.
 
 const config: { [key: string]: Knex.Config } = {
   development: {
-    client: 'sqlite3',
+    client: 'mysql',
     connection: {
-      filename: './dev.sqlite3',
+      // filename: "./dev.mysql"
+      host: 'localhost', // Specify the host where your MySQL server is running
+      database: 'demo_credit',
+      user: 'root',
+      password: '1ubKxc7b£ro2',
     },
   },
 
   staging: {
-    client: 'postgresql',
+    client: 'mysql',
     connection: {
       database: 'my_db',
       user: 'username',
@@ -28,7 +31,7 @@ const config: { [key: string]: Knex.Config } = {
   },
 
   production: {
-    client: 'postgresql',
+    client: 'mysql',
     connection: {
       database: 'my_db',
       user: 'username',
