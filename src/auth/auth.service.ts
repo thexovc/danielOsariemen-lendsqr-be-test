@@ -12,6 +12,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { ConfigService } from '@nestjs/config';
 import { Knex } from 'knex';
 import { JwtService } from '@nestjs/jwt';
+import { firstValueFrom } from 'rxjs';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class AuthService {
@@ -22,9 +24,10 @@ export class AuthService {
     private jwtService: JwtService,
     @Inject('KNEX_CONNECTION')
     private readonly knex: Knex,
+    private readonly httpService: HttpService,
   ) {}
 
-  // //   login
+  //  login
   async login(loginData: loginDto): Promise<any> {
     const existingUser = await this.knex('users')
       .where({
@@ -53,47 +56,68 @@ export class AuthService {
   }
 
   //   register
-  async register(createUserData: RegisterDto): Promise<any> {
+  async register(createUserData: RegisterDto): Promise<{
+    message?: string;
+    error?: boolean;
+    user?: any;
+  }> {
     const existingUser = await this.knex('users')
       .where({
         email: createUserData.email,
       })
       .first();
 
-    console.log({ existingUser });
+    // console.log({ existingUser });
 
     if (existingUser) {
       throw new BadRequestException('Email already registered');
     }
 
-    const { password, email, ...data } = createUserData;
+    try {
+      const url = `${this.configService.get<string>('ADJUTOR_BASE_URL')}/v2/verification/karma/${createUserData.email}`;
 
-    const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+      await firstValueFrom(
+        this.httpService.get(url, {
+          headers: {
+            Authorization: `Bearer ${this.configService.get<string>('ADJUTOR_SECRET')}`,
+          },
+        }),
+      );
 
-    let api_key = this.generateUniqueApiKey();
+      return {
+        error: true,
+        message: 'Email In Karma Blacklist',
+      };
+    } catch (error) {
+      const { password, email, ...data } = createUserData;
 
-    // Check if api_key already exists, if so, generate another one
-    while (await this.apiKeyExists(api_key)) {
-      api_key = this.generateUniqueApiKey();
+      const hashedPassword = await bcrypt.hash(password, this.saltRounds);
+
+      let api_key = this.generateUniqueApiKey();
+
+      // Check if api_key already exists, if so, generate another one
+      while (await this.apiKeyExists(api_key)) {
+        api_key = this.generateUniqueApiKey();
+      }
+
+      const [userId] = await this.knex('users')
+        .insert({
+          email,
+          password: hashedPassword,
+          api_key,
+          ...data,
+        })
+        .returning('id'); // 'returning' ensures the ID is returned
+
+      const newUser = await this.knex('users').where('id', userId).first();
+
+      // await this.generateAndSendToken(newUser.email);
+
+      return {
+        message: 'registration successful!',
+        user: newUser,
+      };
     }
-
-    const [userId] = await this.knex('users')
-      .insert({
-        email,
-        password: hashedPassword,
-        api_key,
-        ...data,
-      })
-      .returning('id'); // 'returning' ensures the ID is returned
-
-    const newUser = await this.knex('users').where('id', userId).first();
-
-    // await this.generateAndSendToken(newUser.email);
-
-    return {
-      message: 'registration successful!',
-      user: newUser,
-    };
   }
 
   private generateUniqueApiKey(): string {

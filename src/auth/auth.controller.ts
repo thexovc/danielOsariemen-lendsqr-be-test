@@ -1,4 +1,11 @@
-import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpException,
+  HttpStatus,
+  Post,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, loginDto } from './dto/auth.dto';
 
@@ -10,6 +17,14 @@ export class AuthController {
   async register(@Body(new ValidationPipe()) registerDto: RegisterDto) {
     try {
       const res = await this.authService.register(registerDto);
+
+      if (
+        res?.error &&
+        res?.message.toLowerCase() == 'Email In Karma Blacklist'.toLowerCase()
+      ) {
+        throw new HttpException(res?.message, HttpStatus.FORBIDDEN);
+      }
+
       return res;
     } catch (error) {
       console.log({ error });
