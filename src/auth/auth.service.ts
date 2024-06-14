@@ -1,49 +1,67 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { RegisterDto, loginDto } from './dto/auth.dto';
+import * as bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
+import { ConfigService } from '@nestjs/config';
+import { Knex } from 'knex';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  //   login
-  async login(loginData: loginDto): Promise<any> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: loginData.email.toLowerCase(),
-      },
-    });
+  private readonly saltRounds = 10;
 
-    if (!existingUser) {
-      throw new NotFoundException('Email is invalid');
-    }
+  constructor(
+    private readonly configService: ConfigService,
+    private jwtService: JwtService,
+    @Inject('KNEX_CONNECTION')
+    private readonly knex: Knex,
+  ) {}
 
-    const passwordMatch = await bcrypt.compare(
-      loginData.password,
-      existingUser.password,
-    );
+  // //   login
+  // async login(loginData: loginDto): Promise<any> {
+  //   const existingUser = await this.prisma.user.findUnique({
+  //     where: {
+  //       email: loginData.email.toLowerCase(),
+  //     },
+  //   });
 
-    if (!passwordMatch) {
-      throw new HttpException('password incorrect', HttpStatus.UNAUTHORIZED);
-    }
+  //   if (!existingUser) {
+  //     throw new NotFoundException('Email is invalid');
+  //   }
 
-    if (!existingUser.emailConfirmed) {
-      this.generateAndSendToken(loginData.email);
+  //   const passwordMatch = await bcrypt.compare(
+  //     loginData.password,
+  //     existingUser.password,
+  //   );
 
-      throw new HttpException('email not confirmed', HttpStatus.UNAUTHORIZED);
-    }
+  //   if (!passwordMatch) {
+  //     throw new HttpException('password incorrect', HttpStatus.UNAUTHORIZED);
+  //   }
 
-    const access_token = jwt.sign(existingUser, this.secretKey, {
-      expiresIn: '5h',
-    });
+  //   if (!existingUser.emailConfirmed) {
+  //     // this.generateAndSendToken(loginData.email);
 
-    const { password, ...rest } = existingUser;
+  //     throw new HttpException('email not confirmed', HttpStatus.UNAUTHORIZED);
+  //   }
 
-    return { access_token, data: rest };
-  }
+  //   const access_token = this.jwtService.signAsync(existingUser);
+
+  //   const { password, ...rest } = existingUser;
+
+  //   return { access_token, data: rest };
+  // }
 
   //   register
   async register(createUserData: RegisterDto): Promise<any> {
-    const existingUser = await this.prisma.user.findUnique({
-      where: {
-        email: createUserData.email.toLowerCase(),
-      },
+    const existingUser = await this.knex('users').where({
+      email: createUserData.email,
     });
 
     if (existingUser) {
@@ -61,18 +79,44 @@ export class AuthService {
       api_key = this.generateUniqueApiKey();
     }
 
-    const newUser = await this.prisma.user.create({
-      data: {
-        ...data,
-        email: email.toLowerCase(),
-        api_key,
-        password: hashedPassword,
-      },
+    const newUser = await this.knex('users').insert({
+      email,
+      password: hashedPassword,
+      ...data,
+      api_key,
     });
 
-    // await this.emailsService.sendWelcomeEmail(newUser);
-    await this.generateAndSendToken(newUser.email);
+    // await this.generateAndSendToken(newUser.email);
 
-    return { message: 'registration successfull check email to confirm!' };
+    return {
+      message: 'registration successful check email to confirm!',
+      user: newUser,
+    };
   }
+
+  private generateUniqueApiKey(): string {
+    // Generate a unique API key
+    return uuidv4();
+  }
+
+  private async apiKeyExists(api_key: string): Promise<boolean> {
+    const user = await this.knex('users').where({
+      api_key,
+    });
+    return !!user;
+  }
+
+  // private async generateAndSendToken(email: string) {
+  //   const user = await this.prisma.user.findUnique({ where: { email } });
+
+  //   if (!user) {
+  //     throw new NotFoundException('User not found');
+  //   }
+
+  //   const token = this.jwtService.signAsync({ id: user.id });
+
+  //   const confirmationLink = `${this.configService.get<string>('WEB_URL')}/verification/${token}`;
+
+  //   // this.emailsService.sendConfirmEmail(user, confirmationLink);
+  // }
 }

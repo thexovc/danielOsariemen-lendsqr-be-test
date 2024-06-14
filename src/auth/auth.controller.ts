@@ -1,5 +1,6 @@
 import { Body, Controller, Post, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { RegisterDto, loginDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -16,14 +17,14 @@ export class AuthController {
     }
   }
 
-  @Post('login')
-  async login(@Body(new ValidationPipe()) loginData: loginDto) {
-    try {
-      const res = await this.authService.login(loginData);
-      return res;
-    } catch (error) {
-      console.log({ error });
-      throw error;
-    }
-  }
+  // @Post('login')
+  // async login(@Body(new ValidationPipe()) loginData: loginDto) {
+  //   try {
+  //     const res = await this.authService.login(loginData);
+  //     return res;
+  //   } catch (error) {
+  //     console.log({ error });
+  //     throw error;
+  //   }
+  // }
 }
