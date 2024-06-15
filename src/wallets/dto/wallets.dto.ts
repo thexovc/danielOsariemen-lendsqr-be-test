@@ -1,6 +1,7 @@
 import { IsNotEmpty, IsString, IsNumber, Min } from 'class-validator';
 
 export class FundAccountDto {
+  @IsNotEmpty()
   @IsNumber()
   @Min(0)
   amount: number;
