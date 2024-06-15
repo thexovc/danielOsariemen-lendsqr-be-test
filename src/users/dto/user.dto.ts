@@ -5,19 +5,15 @@ import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 export class UpdateUserDto {
   @IsOptional()
   @IsString()
-  firstName?: string;
+  first_name?: string;
 
   @IsOptional()
   @IsString()
-  lastName?: string;
+  last_name?: string;
 
   @IsOptional()
   @IsString()
-  businessName?: string;
-
-  @IsOptional()
-  @IsString()
-  phoneNumber?: string;
+  phone_number?: string;
 }
 
 export class UpdatePasswordDto {
