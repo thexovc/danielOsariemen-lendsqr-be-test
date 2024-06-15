@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Request,
   UseGuards,
@@ -13,6 +14,18 @@ import { AuthGuard } from 'src/guard/auth.guard';
 @Controller('v1/wallet')
 export class WalletsController {
   constructor(private readonly walletsService: WalletsService) {}
+
+  @UseGuards(AuthGuard)
+  @Get()
+  async getWallet(@Request() req) {
+    return this.walletsService.getWallet(req.user.id);
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('create')
+  async create(@Request() req) {
+    return this.walletsService.createWallet(req.user.id);
+  }
 
   @UseGuards(AuthGuard)
   @Post('fund')

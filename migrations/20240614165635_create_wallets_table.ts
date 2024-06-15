@@ -3,7 +3,7 @@ import { Knex } from 'knex';
 export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('wallets', function (table) {
     table.increments('id').primary();
-    table.integer('user_id').unsigned().notNullable();
+    table.integer('user_id').unsigned().notNullable().unique();
     table.double('balance').defaultTo(0);
     table
       .enum('currency', ['NGN', 'EUR', 'USD'])
