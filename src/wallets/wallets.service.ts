@@ -9,7 +9,7 @@ export class WalletsService {
   ) {}
 
   async getWallet(user_id: number): Promise<any> {
-    const wallet = await this.knex('wallets').where({ user_id: 8 }).first();
+    const wallet = await this.knex('wallets').where({ user_id }).first();
 
     if (!wallet) {
       throw new HttpException('Wallet not found', HttpStatus.NOT_FOUND);
@@ -70,6 +70,7 @@ export class WalletsService {
     const senderWallet = await this.knex('wallets')
       .join('users', 'wallets.user_id', 'users.id')
       .where('users.id', userId)
+      .select('wallets.id', 'wallets.balance')
       .first();
     if (!senderWallet) {
       throw new HttpException('Sender wallet not found', HttpStatus.NOT_FOUND);
@@ -82,6 +83,7 @@ export class WalletsService {
     const recipientWallet = await this.knex('wallets')
       .join('users', 'wallets.user_id', 'users.id')
       .where('users.email', recipientEmail)
+      .select('wallets.id', 'wallets.balance')
       .first();
     if (!recipientWallet) {
       throw new HttpException(
@@ -90,20 +92,57 @@ export class WalletsService {
       );
     }
 
+    let senderTrxId = null;
+
     await this.knex.transaction(async (trx) => {
-      await trx('wallets')
+      const updatedSender = await trx('wallets')
         .where({ id: senderWallet.id })
         .update({ balance: senderWallet.balance - amount });
-      await trx('wallets')
+
+      const updatedRecipient = await trx('wallets')
         .where({ id: recipientWallet.id })
         .update({ balance: recipientWallet.balance + amount });
-      await trx('transactions').insert([
-        { wallet_id: senderWallet.id, amount, type: 'transfer' },
-        { wallet_id: recipientWallet.id, amount, type: 'deposit' },
-      ]);
+
+      if (!updatedSender || !updatedRecipient) {
+        throw new HttpException(
+          'Failed to update wallets',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+
+      const [senderTransactionId] = await trx('transactions')
+        .insert({
+          wallet_id: senderWallet.id,
+          amount: -amount,
+          type: 'transfer',
+        })
+        .returning('id');
+
+      senderTrxId = senderTransactionId;
+
+      //   console.log({ sendTransac });
+
+      const recipientTransaction = await trx('transactions').insert({
+        wallet_id: recipientWallet.id,
+        amount,
+        type: 'deposit',
+      });
+
+      if (!senderTransactionId || !recipientTransaction) {
+        throw new HttpException(
+          'Failed to record transactions',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
     });
 
-    return { balance: senderWallet.balance - amount };
+    console.log({ senderTrxId });
+
+    const sendTransac = await this.knex('transactions')
+      .where('id', senderTrxId)
+      .first();
+
+    return sendTransac;
   }
 
   async withdrawFunds(userId: number, amount: number) {
@@ -119,13 +158,17 @@ export class WalletsService {
     }
 
     const newBalance = wallet.balance - amount;
-    await this.knex('wallets')
-      .where({ user_id: userId })
-      .update({ balance: newBalance });
-    await this.knex('transactions').insert({
-      wallet_id: wallet.id,
-      amount,
-      type: 'withdrawal',
+
+    await this.knex.transaction(async (trx) => {
+      await trx('wallets')
+        .where({ user_id: userId })
+        .update({ balance: newBalance });
+
+      await trx('transactions').insert({
+        wallet_id: wallet.id,
+        amount,
+        type: 'withdrawal',
+      });
     });
 
     return { balance: newBalance };

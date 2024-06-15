@@ -8,7 +8,11 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
-import { FundAccountDto, TransferFundsDto } from './dto/wallets.dto';
+import {
+  FundAccountDto,
+  TransferFundsDto,
+  WithdrawFundsDto,
+} from './dto/wallets.dto';
 import { AuthGuard } from 'src/guard/auth.guard';
 
 @Controller('v1/wallet')
@@ -36,17 +40,27 @@ export class WalletsController {
     return this.walletsService.fundAccount(req.user.id, fundAccountDto.amount);
   }
 
-  //   @Post(':userId/transfer')
-  //   async transferFunds(@Body() transferFundsDto: TransferFundsDto) {
-  //     return this.walletsService.transferFunds(
-  //       userId,
-  //       transferFundsDto.amount,
-  //       transferFundsDto.recipient_email,
-  //     );
-  //   }
+  @UseGuards(AuthGuard)
+  @Post('transfer')
+  async transferFunds(
+    @Request() req,
+    @Body() transferFundsDto: TransferFundsDto,
+  ) {
+    return this.walletsService.transferFunds(
+      req.user.id,
+      transferFundsDto.amount,
+      transferFundsDto.recipient_email,
+    );
+  }
 
-  //   @Post(':userId/withdraw')
-  //   async withdrawFunds(@Body() withdrawFundsDto: WithdrawFundsDto) {
-  //     return this.walletsService.withdrawFunds(userId, withdrawFundsDto.amount);
-  //   }
+  @Post('withdraw')
+  async withdrawFunds(
+    @Request() req,
+    @Body() withdrawFundsDto: WithdrawFundsDto,
+  ) {
+    return this.walletsService.withdrawFunds(
+      req.user.id,
+      withdrawFundsDto.amount,
+    );
+  }
 }
