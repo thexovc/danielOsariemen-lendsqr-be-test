@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { WalletsService } from './wallets.service';
 import {
+  CreateWalletDto,
   FundAccountDto,
   TransferFundsDto,
   WithdrawFundsDto,
@@ -27,8 +28,11 @@ export class WalletsController {
 
   @UseGuards(AuthGuard)
   @Post('create')
-  async create(@Request() req) {
-    return this.walletsService.createWallet(req.user.id);
+  async create(
+    @Request() req,
+    @Body(new ValidationPipe()) bodyData: CreateWalletDto,
+  ) {
+    return this.walletsService.createWallet(req.user.id, bodyData);
   }
 
   @UseGuards(AuthGuard)

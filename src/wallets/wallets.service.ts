@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { Knex } from 'knex';
+import { CreateWalletDto } from './dto/wallets.dto';
 
 @Injectable()
 export class WalletsService {
@@ -18,26 +19,30 @@ export class WalletsService {
     return wallet;
   }
 
-  async createWallet(user_id: number): Promise<any> {
+  async createWallet(
+    user_id: number,
+    createWalletDto: CreateWalletDto,
+  ): Promise<any> {
     const existingWallet = await this.knex('wallets')
-      .where({ user_id })
+      .where({
+        user_id,
+        currency: createWalletDto.currency,
+      })
       .first();
 
     if (existingWallet) {
-      throw new HttpException('Wallet already created', HttpStatus.CONFLICT);
+      throw new HttpException(
+        'Wallet already exists for this currency',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
-    await this.knex('wallets')
-      .insert({
-        user_id,
-        currency: 'NGN',
-        balance: 0, // Default balance
-      })
-      .returning('id'); // 'returning' ensures the ID is returned
+    const [walletId] = await this.knex('wallets').insert({
+      user_id,
+      currency: createWalletDto.currency,
+    });
 
-    const walletInfo = await this.knex('wallets').where({ user_id }).first();
-
-    return walletInfo;
+    return await this.knex('wallets').where({ id: walletId }).first();
   }
 
   async fundAccount(user_id: number, amount: number) {

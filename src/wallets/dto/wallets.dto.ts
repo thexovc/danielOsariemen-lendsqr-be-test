@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsString, IsNumber, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsNumber, Min, IsEnum } from 'class-validator';
+
+export class CreateWalletDto {
+  @IsEnum(['NGN', 'EUR', 'USD'])
+  @IsNotEmpty()
+  currency: 'NGN' | 'EUR' | 'USD';
+}
 
 export class FundAccountDto {
   @IsNotEmpty()
