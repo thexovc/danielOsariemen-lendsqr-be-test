@@ -6,6 +6,10 @@ export async function up(knex: Knex): Promise<void> {
     table.integer('wallet_id').unsigned().notNullable();
     table.double('amount').notNullable();
     table.enum('type', ['deposit', 'withdrawal', 'transfer']).notNullable();
+    table
+      .enum('currency', ['NGN', 'EUR', 'USD'])
+      .notNullable()
+      .defaultTo('NGN');
     table.timestamps(true, true);
 
     table
