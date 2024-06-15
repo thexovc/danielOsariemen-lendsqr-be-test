@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Request,
   UseGuards,
   ValidationPipe,
@@ -11,6 +12,7 @@ import { WalletsService } from './wallets.service';
 import {
   CreateWalletDto,
   FundAccountDto,
+  GetWalletDto,
   TransferFundsDto,
   WithdrawFundsDto,
 } from './dto/wallets.dto';
@@ -22,8 +24,11 @@ export class WalletsController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getWallet(@Request() req) {
-    return this.walletsService.getWallet(req.user.id);
+  async getWallet(
+    @Request() req,
+    @Query(new ValidationPipe()) queryData: GetWalletDto,
+  ) {
+    return this.walletsService.getWallet(req.user.id, queryData);
   }
 
   @UseGuards(AuthGuard)
@@ -41,30 +46,24 @@ export class WalletsController {
     @Request() req,
     @Body(new ValidationPipe()) fundAccountDto: FundAccountDto,
   ) {
-    return this.walletsService.fundAccount(req.user.id, fundAccountDto.amount);
+    return this.walletsService.fundAccount(req.user.id, fundAccountDto);
   }
 
   @UseGuards(AuthGuard)
   @Post('transfer')
   async transferFunds(
     @Request() req,
-    @Body() transferFundsDto: TransferFundsDto,
+    @Body(new ValidationPipe()) transferFundsDto: TransferFundsDto,
   ) {
-    return this.walletsService.transferFunds(
-      req.user.id,
-      transferFundsDto.amount,
-      transferFundsDto.recipient_email,
-    );
+    return this.walletsService.transferFunds(req.user.id, transferFundsDto);
   }
 
+  @UseGuards(AuthGuard)
   @Post('withdraw')
   async withdrawFunds(
     @Request() req,
-    @Body() withdrawFundsDto: WithdrawFundsDto,
+    @Body(new ValidationPipe()) withdrawFundsDto: WithdrawFundsDto,
   ) {
-    return this.walletsService.withdrawFunds(
-      req.user.id,
-      withdrawFundsDto.amount,
-    );
+    return this.walletsService.withdraw(req.user.id, withdrawFundsDto);
   }
 }
