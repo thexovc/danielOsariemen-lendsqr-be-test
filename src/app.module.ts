@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { WalletModule } from './wallets/wallets.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { jwtConstants } from './constants';
     }),
     UsersModule,
     AuthModule,
+    WalletModule,
   ],
   controllers: [AppController],
   providers: [AppService],
