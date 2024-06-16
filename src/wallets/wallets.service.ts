@@ -75,6 +75,7 @@ export class WalletsService {
         .update({ balance: newBalance });
 
       await trx('transactions').insert({
+        user_id,
         wallet_id: wallet.id,
         amount: updateWalletDto.amount,
         type: 'deposit',
@@ -218,6 +219,7 @@ export class WalletsService {
 
       const [senderTransactionId] = await trx('transactions')
         .insert({
+          user_id: userId,
           wallet_id: senderWallet.id,
           amount: -transferData.amount,
           type: 'transfer',
@@ -228,6 +230,7 @@ export class WalletsService {
       senderTrxId = senderTransactionId;
 
       const recipientTransaction = await trx('transactions').insert({
+        user_id: userId,
         wallet_id: recipientWallet.id,
         amount: transferData.amount,
         type: 'deposit',
