@@ -93,18 +93,10 @@ export class AuthService {
 
       const hashedPassword = await bcrypt.hash(password, this.saltRounds);
 
-      let api_key = this.generateUniqueApiKey();
-
-      // Check if api_key already exists, if so, generate another one
-      while (await this.apiKeyExists(api_key)) {
-        api_key = this.generateUniqueApiKey();
-      }
-
       const [userId] = await this.knex('users')
         .insert({
           email,
           password: hashedPassword,
-          api_key,
           ...data,
         })
         .returning('id'); // 'returning' ensures the ID is returned
@@ -119,29 +111,4 @@ export class AuthService {
       };
     }
   }
-
-  private generateUniqueApiKey(): string {
-    // Generate a unique API key
-    return uuidv4();
-  }
-
-  private async apiKeyExists(api_key: string): Promise<boolean> {
-    const user = await this.knex('users').where({ api_key }).first();
-
-    return !!user; // This will return true if user is found, false otherwise
-  }
-
-  // private async generateAndSendToken(email: string) {
-  //   const user = await this.prisma.user.findUnique({ where: { email } });
-
-  //   if (!user) {
-  //     throw new NotFoundException('User not found');
-  //   }
-
-  //   const token = this.jwtService.signAsync({ id: user.id });
-
-  //   const confirmationLink = `${this.configService.get<string>('WEB_URL')}/verification/${token}`;
-
-  //   // this.emailsService.sendConfirmEmail(user, confirmationLink);
-  // }
 }

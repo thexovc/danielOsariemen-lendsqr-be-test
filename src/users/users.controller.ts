@@ -17,13 +17,13 @@ export class UsersController {
 
   @UseGuards(AuthGuard)
   @Get()
-  async getWallet(@Request() req) {
+  async getUser(@Request() req) {
     return this.usersService.getUser(req.user.id);
   }
 
   @UseGuards(AuthGuard)
   @Put()
-  async create(
+  async updateUser(
     @Request() req,
     @Body(new ValidationPipe()) bodyData: UpdateUserDto,
   ) {

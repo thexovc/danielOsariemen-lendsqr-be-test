@@ -15,31 +15,21 @@ export class AuthController {
 
   @Post('register')
   async register(@Body(new ValidationPipe()) registerDto: RegisterDto) {
-    try {
-      const res = await this.authService.register(registerDto);
+    const res = await this.authService.register(registerDto);
 
-      if (
-        res?.error &&
-        res?.message.toLowerCase() == 'Email In Karma Blacklist'.toLowerCase()
-      ) {
-        throw new HttpException(res?.message, HttpStatus.FORBIDDEN);
-      }
-
-      return res;
-    } catch (error) {
-      console.log({ error });
-      throw error;
+    if (
+      res?.error &&
+      res?.message.toLowerCase() == 'Email In Karma Blacklist'.toLowerCase()
+    ) {
+      throw new HttpException(res?.message, HttpStatus.FORBIDDEN);
     }
+
+    return res;
   }
 
   @Post('login')
   async login(@Body(new ValidationPipe()) loginData: loginDto) {
-    try {
-      const res = await this.authService.login(loginData);
-      return res;
-    } catch (error) {
-      console.log({ error });
-      throw error;
-    }
+    const res = await this.authService.login(loginData);
+    return res;
   }
 }
