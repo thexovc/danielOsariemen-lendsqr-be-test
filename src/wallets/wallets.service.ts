@@ -277,6 +277,7 @@ export class WalletsService {
 
       // Log the withdrawal transaction
       await trx('transactions').insert({
+        user_id: userId,
         wallet_id: wallet.id,
         amount: -amount,
         type: 'withdrawal',

@@ -16,7 +16,7 @@ import {
   TransferFundsDto,
   WithdrawFundsDto,
 } from './dto/wallets.dto';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 
 @Controller('v1/wallet')
 export class WalletsController {
