@@ -1,4 +1,4 @@
-# Demo Credit Service
+# Demo Credit Wallet Service
 
 ## Table of Contents
 
@@ -19,7 +19,19 @@
 
 ## Introduction
 
-This project is a RESTful API built with NestJS that handles wallet management, user authentication, and transaction processing. It includes functionalities for registering users, logging in, creating wallets, funding accounts, transferring funds, and withdrawing funds.
+### Project Description
+
+**Demo Credit Wallet Service**
+
+The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to provide essential wallet functionalities for a mobile lending app. This project simulates a backend service where users can manage their financial transactions seamlessly. It is built using NodeJS with TypeScript, leveraging the KnexJS ORM for database interactions with a MySQL database.
+
+**Features:**
+
+1. **User Account Creation:** Users can create an account to manage their wallet.
+2. **Fund Account:** Users can add funds to their wallet.
+3. **Transfer Funds:** Users can transfer funds to another user's wallet.
+4. **Withdraw Funds:** Users can withdraw funds from their wallet.
+5. **Blacklist Verification:** Users listed in the Lendsqr Adjutor Karma blacklist are prevented from creating an account.
 
 ## Features
 
