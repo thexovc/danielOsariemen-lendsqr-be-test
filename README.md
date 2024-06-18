@@ -10,6 +10,10 @@
 - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
 - [API Documentation](#api-documentation)
+  - [Auth API](#auth-api)
+  - [Users API](#users-api)
+  - [Wallets API](#wallets-api)
+  - [Transactions API](#transactions-api)
 - [Testing](#testing)
 - [License](#license)
 
@@ -112,7 +116,7 @@ The application will be running on `http://localhost:3000`.
 
 ## API Documentation
 
-## Auth Routes
+## Auth API
 
 ### POST /v1/auth/register
 
@@ -197,7 +201,7 @@ Logs in an existing user.
 
 ---
 
-## User Routes
+## Users API
 
 ### GET /v1/users
 
@@ -264,7 +268,7 @@ Updates the details of the authenticated user.
 
 ---
 
-## Wallet Routes
+## Wallets API
 
 ### GET /v1/wallet
 
@@ -501,7 +505,7 @@ Withdraws funds from the user's wallet.
 
 ---
 
-## Transactions Routes
+## Transactions API
 
 ### GET /v1/transactions/single/:transactionId
 
@@ -608,12 +612,9 @@ npm run test
 
 This will execute unit tests for the application, ensuring that all functionalities work as expected.
 
-## License
+## Author
 
-This project is licensed under the MIT License. See the [LICENSE](./LICENSE) file for more details.
-
----
-
-### ER Diagram Example
-
-Here is an example ER diagram for your project:
+- **Your Name**
+  - [LinkedIn](https://www.linkedin.com/in/daniel-osariemen-095772210/)
+  - [Twitter](https://twitter.com/thexovc)
+  - [Portfolio](https://danielosariemen.vercel.app/)
