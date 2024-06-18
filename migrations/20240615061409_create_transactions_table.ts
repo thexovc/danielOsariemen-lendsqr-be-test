@@ -4,13 +4,10 @@ export async function up(knex: Knex): Promise<void> {
   await knex.schema.createTable('transactions', function (table) {
     table.increments('id').primary();
     table.integer('wallet_id').unsigned().notNullable();
-    table.integer('user_id').unsigned().notNullable();
+    // table.integer('user_id').unsigned().notNullable();
     table.double('amount').notNullable();
     table.enum('type', ['deposit', 'withdrawal', 'transfer']).notNullable();
-    table
-      .enum('currency', ['NGN', 'EUR', 'USD'])
-      .notNullable()
-      .defaultTo('NGN');
+    table.enum('currency', ['NGN', 'EUR', 'USD']).notNullable();
     table.timestamps(true, true);
 
     table
@@ -19,11 +16,11 @@ export async function up(knex: Knex): Promise<void> {
       .inTable('wallets')
       .onDelete('CASCADE');
 
-    table
-      .foreign('user_id')
-      .references('id')
-      .inTable('users')
-      .onDelete('CASCADE');
+    // table
+    //   .foreign('user_id')
+    //   .references('id')
+    //   .inTable('users')
+    //   .onDelete('CASCADE');
   });
 }
 

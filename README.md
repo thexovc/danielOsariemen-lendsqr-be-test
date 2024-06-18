@@ -34,7 +34,25 @@ This project is a RESTful API built with NestJS that handles wallet management, 
 
 ## ER Diagram
 
-![ER Diagram](./er-diagram.png)
+```plaintext
++------------+     +---------+     +--------------+
+|   Users    |     | Wallets |     | Transactions |
++------------+     +---------+     +--------------+
+| id         |<---1| id      |<--1 | id           |
+| email      |     | user_id |     | wallet_id    |
+| password   |     | balance |     | amount       |
+| created_at |     | currency|     | type         |
+| updated_at |     | created_at|   | created_at   |
++------------+     | updated_at|   | updated_at   |
+                   +---------+     +--------------+
+```
+
+In this diagram:
+
+- A user can have multiple wallets.
+- Each wallet belongs to a single user.
+- A wallet can have multiple transactions.
+- Each transaction is associated with a single wallet.
 
 The ER diagram illustrates the relationships between the tables:
 
@@ -447,12 +465,13 @@ Withdraws funds from the user's wallet.
   - **Success**: Returns the updated wallet object.
     ```json
     {
-      "id": 2,
-      "user_id": 1,
-      "balance": 1500,
+      "id": 7,
+      "wallet_id": 2,
+      "amount": -400,
+      "type": "withdrawal",
       "currency": "NGN",
-      "created_at": "2024-06-17T18:00:09.000Z",
-      "updated_at": "2024-06-17T18:00:09.000Z"
+      "created_at": "2024-06-18T10:40:55.000Z",
+      "updated_at": "2024-06-18T10:40:55.000Z"
     }
     ```
 
@@ -598,23 +617,3 @@ This project is licensed under the MIT License. See the [LICENSE](./LICENSE) fil
 ### ER Diagram Example
 
 Here is an example ER diagram for your project:
-
-```plaintext
-+------------+     +---------+     +--------------+
-|   Users    |     | Wallets |     | Transactions |
-+------------+     +---------+     +--------------+
-| id         |<---1| id      |<--1 | id           |
-| email      |     | user_id |     | wallet_id    |
-| password   |     | balance |     | amount       |
-| created_at |     | currency|     | type         |
-| updated_at |     | created_at|   | created_at   |
-+------------+     | updated_at|   | updated_at   |
-                   +---------+     +--------------+
-```
-
-In this diagram:
-
-- A user can have multiple wallets.
-- Each wallet belongs to a single user.
-- A wallet can have multiple transactions.
-- Each transaction is associated with a single wallet.

@@ -5,10 +5,8 @@ export async function up(knex: Knex): Promise<void> {
     table.increments('id').primary();
     table.integer('user_id').unsigned().notNullable();
     table.double('balance').defaultTo(0);
-    table
-      .enum('currency', ['NGN', 'EUR', 'USD'])
-      .notNullable()
-      .defaultTo('NGN');
+    table.enum('currency', ['NGN', 'EUR', 'USD']).notNullable();
+
     table.timestamps(true, true);
 
     table
