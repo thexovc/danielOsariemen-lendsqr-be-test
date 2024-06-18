@@ -7,7 +7,7 @@ export const KNEX_CONNECTION = 'KNEX_CONNECTION';
 export const knexProvider: Provider = {
   provide: KNEX_CONNECTION,
   useFactory: async () => {
-    const knex = Knex(KnexConfig.development);
+    const knex = Knex(KnexConfig.production);
     return knex;
   },
 };

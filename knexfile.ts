@@ -1,13 +1,14 @@
 import type { Knex } from 'knex';
 
-// Update with your config settings.
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const config: { [key: string]: Knex.Config } = {
   development: {
     client: 'mysql',
     connection: {
       // filename: "./dev.mysql"
-      host: 'localhost', // Specify the host where your MySQL server is running
+      host: 'localhost',
       database: 'demo_credit',
       user: 'root',
       password: '1ubKxc7b£ro2',
@@ -31,11 +32,12 @@ const config: { [key: string]: Knex.Config } = {
   },
 
   production: {
-    client: 'mysql',
+    client: 'mysql2',
     connection: {
-      database: 'my_db',
-      user: 'username',
-      password: 'password',
+      host: process.env.DB_HOST,
+      database: process.env.DB_NAME,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
     },
     pool: {
       min: 2,

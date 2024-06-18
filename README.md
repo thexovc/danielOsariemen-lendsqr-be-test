@@ -46,23 +46,6 @@ The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to pr
 - **Authentication**: JWT (JSON Web Tokens)
 - **Validation**: [class-validator](https://github.com/typestack/class-validator)
 
-## ER Diagram
-
-![ER Diagram](./images/er-diagram.png)
-
-In this diagram:
-
-- A user can have multiple wallets.
-- Each wallet belongs to a single user.
-- A wallet can have multiple transactions.
-- Each transaction is associated with a single wallet.
-
-The ER diagram illustrates the relationships between the tables:
-
-- **Users**: Stores user information.
-- **Wallets**: Each wallet belongs to a user.
-- **Transactions**: Records transactions related to wallets.
-
 ## Installation
 
 To get started with the project, follow these steps:
@@ -112,6 +95,121 @@ To run the application locally:
    ```
 
 The application will be running on `http://localhost:3000`.
+
+## ER Diagram
+
+![ER Diagram](./images/er-diagram.png)
+
+In this diagram:
+
+- A user can have multiple wallets.
+- Each wallet belongs to a single user.
+- A wallet can have multiple transactions.
+- Each transaction is associated with a single wallet.
+
+The ER diagram illustrates the relationships between the tables:
+
+- **Users**: Stores user information.
+- **Wallets**: Each wallet belongs to a user.
+- **Transactions**: Records transactions related to wallets.
+
+## DATABASE Schema
+
+### Users Table
+
+```
+import { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('users', function (table) {
+    table.increments('id').primary();
+    table.string('email').notNullable().unique();
+    table.string('first_name').notNullable();
+    table.string('last_name').notNullable();
+    table.string('password').notNullable();
+    table.string('phone_number').nullable();
+    table.timestamps(true, true);
+  });
+}
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTable('users');
+}
+
+
+```
+
+### Wallets Table
+
+```
+import { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('wallets', function (table) {
+    table.increments('id').primary();
+    table.integer('user_id').unsigned().notNullable();
+    table.double('balance').defaultTo(0);
+    table.enum('currency', ['NGN', 'EUR', 'USD']).notNullable();
+
+    table.timestamps(true, true);
+
+    table
+      .foreign('user_id')
+      .references('id')
+      .inTable('users')
+      .onDelete('CASCADE');
+  });
+}
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTable('wallets');
+}
+
+
+```
+
+### Transactions Table
+
+```
+import { Knex } from 'knex';
+
+export async function up(knex: Knex): Promise<void> {
+  await knex.schema.createTable('transactions', function (table) {
+    table.increments('id').primary();
+    table.integer('wallet_id').unsigned().notNullable();
+    table.double('amount').notNullable();
+    table.enum('type', ['deposit', 'withdrawal', 'transfer']).notNullable();
+    table.enum('currency', ['NGN', 'EUR', 'USD']).notNullable();
+    table.timestamps(true, true);
+
+    table
+      .foreign('wallet_id')
+      .references('id')
+      .inTable('wallets')
+      .onDelete('CASCADE');
+  });
+}
+
+export async function down(knex: Knex): Promise<void> {
+  await knex.schema.dropTable('transactions');
+}
+
+```
+
+![ER Diagram](./images/er-diagram.png)
+
+In this diagram:
+
+- A user can have multiple wallets.
+- Each wallet belongs to a single user.
+- A wallet can have multiple transactions.
+- Each transaction is associated with a single wallet.
+
+The ER diagram illustrates the relationships between the tables:
+
+- **Users**: Stores user information.
+- **Wallets**: Each wallet belongs to a user.
+- **Transactions**: Records transactions related to wallets.
 
 ## API Documentation
 
