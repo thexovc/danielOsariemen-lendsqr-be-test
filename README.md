@@ -103,12 +103,14 @@ Registers a new user.
 - **URL**: `/v1/auth/register`
 - **Method**: `POST`
 - **Request Body**:
+
   - `email` (string, required): The user's email address.
   - `password` (string, required): The user's password.
   - `firstName` (string, required): The user's first name.
   - `lastName` (string, required): The user's last name.
 
 - **Response**:
+
   - **Success**: Returns the created user object.
     ```json
     {
@@ -121,13 +123,18 @@ Registers a new user.
     }
     ```
   - **Error**: Returns an error message if email is in Karma blacklist.
+
     ```json
     {
       "statusCode": 403,
       "message": "Email In Karma Blacklist"
     }
     ```
+
     ```
+
+    ```
+
   - **Error**: Returns an error message if email already registered.
     ```json
     {
@@ -143,6 +150,7 @@ Logs in an existing user.
 - **URL**: `/v1/auth/login`
 - **Method**: `POST`
 - **Request Body**:
+
   - `email` (string, required): The user's email address.
   - `password` (string, required): The user's password.
 
@@ -151,14 +159,14 @@ Logs in an existing user.
     ```json
     {
       "accessToken": "jwt_token",
-       "data" : {
-                  "id": "1",
-                  "email": "user@example.com",
-                  "firstName": "John",
-                  "lastName": "Doe",
-                  "createdAt": "2023-06-18T00:00:00.000Z",
-                  "updatedAt": "2023-06-18T00:00:00.000Z"
-                }
+      "data": {
+        "id": "1",
+        "email": "user@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "createdAt": "2023-06-18T00:00:00.000Z",
+        "updatedAt": "2023-06-18T00:00:00.000Z"
+      }
     }
     ```
   - **Error**: Returns an error message if the login fails.
@@ -210,6 +218,7 @@ Updates the details of the authenticated user.
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
 - **Request Body**:
+
   - `firstName` (string, optional): The user's first name.
   - `lastName` (string, optional): The user's last name.
   - `email` (string, optional): The user's email address.
@@ -237,7 +246,6 @@ Updates the details of the authenticated user.
 
 ---
 
-
 ## Wallet Routes
 
 ### GET /v1/wallet
@@ -262,11 +270,18 @@ Retrieves the details of the user's wallet.
       "updatedAt": "2023-06-18T00:00:00.000Z"
     }
     ```
-  - **Error**: Returns an error message if the request fails.
+  - **Error**: Returns an error message if the user is not authenticated.
     ```json
     {
       "statusCode": 401,
       "message": "Unauthorized"
+    }
+    ```
+  - **Error**: Returns an error message if wallet not found.
+    ```json
+    {
+      "statusCode": 404,
+      "message": "Wallet not found"
     }
     ```
 
@@ -281,6 +296,7 @@ Creates a new wallet for the user.
 - **Request Body**:
   - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
 - **Response**:
+
   - **Success**: Returns the created wallet object.
     ```json
     {
@@ -292,13 +308,37 @@ Creates a new wallet for the user.
       "updatedAt": "2023-06-18T00:00:00.000Z"
     }
     ```
-  - **Error**: Returns an error message if the creation fails.
-    ```json
-    {
-      "statusCode": 400,
-      "message": "Bad Request"
-    }
-    ```
+
+- **Error**: Returns an error message if the user is not authenticated.
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+
+- **Error**: Returns an error message if user input bad request values.
+
+  ```json
+  {
+    "message": [
+      "currency should not be empty",
+      "currency must be one of the following values: 'NGN', 'EUR', 'USD' "
+    ],
+    "error": "Bad Request",
+    "statusCode": 400
+  }
+  ```
+
+  - **Error**: Returns an error message if wallet already exists.
+
+  ```json
+  {
+    "statusCode": 400,
+    "message": "Wallet already exists for this currency"
+  }
+  ```
 
 ### POST /v1/wallet/fund
 
@@ -312,6 +352,7 @@ Funds the user's wallet.
   - `amount` (number, required): The amount to fund the wallet with. Must be a positive number.
   - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
 - **Response**:
+
   - **Success**: Returns the updated wallet object.
     ```json
     {
@@ -323,13 +364,23 @@ Funds the user's wallet.
       "updatedAt": "2023-06-18T00:00:00.000Z"
     }
     ```
-  - **Error**: Returns an error message if the funding fails.
-    ```json
-    {
-      "statusCode": 400,
-      "message": "Bad Request"
-    }
-    ```
+
+- **Error**: Returns an error message if the user is not authenticated.
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+
+- **Error**: Returns an error message if wallet not founc.
+  ```json
+  {
+    "statusCode": 404,
+    "message": "Wallet not found"
+  }
+  ```
 
 ### POST /v1/wallet/transfer
 
@@ -347,14 +398,27 @@ Transfers funds from the user's wallet to another user's wallet.
   - **Success**: Returns a success message.
     ```json
     {
-      "message": "Transfer successful"
+      "id": 3,
+      "wallet_id": 2,
+      "amount": -1500,
+      "type": "transfer",
+      "currency": "NGN",
+      "created_at": "2024-06-15T21:52:46.000Z",
+      "updated_at": "2024-06-15T21:52:46.000Z"
     }
     ```
-  - **Error**: Returns an error message if the transfer fails.
+  - **Error**: Returns an error message if the sender wallet is not found.
     ```json
     {
-      "statusCode": 400,
-      "message": "Bad Request"
+      "statusCode": 404,
+      "message": "Sender wallet not found"
+    }
+    ```
+  - **Error**: Returns an error message if the recipient wallet is not found.
+    ```json
+    {
+      "statusCode": 404,
+      "message": "Recipient wallet not found"
     }
     ```
 
@@ -373,19 +437,26 @@ Withdraws funds from the user's wallet.
   - **Success**: Returns the updated wallet object.
     ```json
     {
-      "id": "1",
-      "user_id": "1",
-      "balance": 500,
+      "id": 2,
+      "user_id": 1,
+      "balance": 1500,
       "currency": "NGN",
-      "createdAt": "2023-06-18T00:00:00.000Z",
-      "updatedAt": "2023-06-18T00:00:00.000Z"
+      "created_at": "2024-06-17T18:00:09.000Z",
+      "updated_at": "2024-06-17T18:00:09.000Z"
     }
     ```
-  - **Error**: Returns an error message if the withdrawal fails.
+  - **Error**: Returns an error message if the wallet is not found.
+    ```json
+    {
+      "statusCode": 404,
+      "message": "Wallet not found"
+    }
+    ```
+  - **Error**: Returns an error message if the wallet has insufficient balance.
     ```json
     {
       "statusCode": 400,
-      "message": "Bad Request"
+      "message": "Insufficient balance"
     }
     ```
 
