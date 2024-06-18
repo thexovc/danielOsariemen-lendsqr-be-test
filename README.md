@@ -19,8 +19,6 @@
 
 ## Introduction
 
-### Project Description
-
 **Demo Credit Wallet Service**
 
 The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to provide essential wallet functionalities for a mobile lending app. This project simulates a backend service where users can manage their financial transactions seamlessly. It is built using NodeJS with TypeScript, leveraging the KnexJS ORM for database interactions with a MySQL database.
