@@ -48,18 +48,7 @@ The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to pr
 
 ## ER Diagram
 
-```plaintext
-+------------+     +---------+     +--------------+
-|   Users    |     | Wallets |     | Transactions |
-+------------+     +---------+     +--------------+
-| id         |<---1| id      |<--1 | id           |
-| email      |     | user_id |     | wallet_id    |
-| password   |     | balance |     | amount       |
-| created_at |     | currency|     | type         |
-| updated_at |     | created_at|   | created_at   |
-+------------+     | updated_at|   | updated_at   |
-                   +---------+     +--------------+
-```
+![ER Diagram](./images/er-diagram.png)
 
 In this diagram:
 
