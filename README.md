@@ -1,4 +1,4 @@
-# Wallet and Transaction Management API
+# Demo Credit Service
 
 ## Table of Contents
 
@@ -614,7 +614,7 @@ This will execute unit tests for the application, ensuring that all functionalit
 
 ## Author
 
-- **Your Name**
+- **Daniel Osariemen Osazee**
   - [LinkedIn](https://www.linkedin.com/in/daniel-osariemen-095772210/)
   - [Twitter](https://twitter.com/thexovc)
   - [Portfolio](https://danielosariemen.vercel.app/)
