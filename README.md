@@ -5,6 +5,7 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
+- [DATABASE Schema](#database-schema)
 - [ER Diagram](#er-diagram)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
