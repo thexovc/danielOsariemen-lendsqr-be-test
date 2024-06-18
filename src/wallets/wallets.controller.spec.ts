@@ -87,7 +87,7 @@ describe('WalletsController', () => {
         .mockResolvedValue(expectedResult);
 
       const req = { user: { id: userId } };
-      const result = await controller.create(req, createWalletDto);
+      const result = await controller.createWallet(req, createWalletDto);
 
       expect(result).toBe(expectedResult);
       expect(walletsService.createWallet).toHaveBeenCalledWith(

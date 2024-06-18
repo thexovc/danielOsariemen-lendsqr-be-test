@@ -33,7 +33,7 @@ export class WalletsController {
 
   @UseGuards(AuthGuard)
   @Post('create')
-  async create(
+  async createWallet(
     @Request() req,
     @Body(new ValidationPipe()) bodyData: CreateWalletDto,
   ) {
