@@ -96,23 +96,6 @@ To run the application locally:
 
 The application will be running on `http://localhost:3000`.
 
-## ER Diagram
-
-![ER Diagram](./images/er-diagram.png)
-
-In this diagram:
-
-- A user can have multiple wallets.
-- Each wallet belongs to a single user.
-- A wallet can have multiple transactions.
-- Each transaction is associated with a single wallet.
-
-The ER diagram illustrates the relationships between the tables:
-
-- **Users**: Stores user information.
-- **Wallets**: Each wallet belongs to a user.
-- **Transactions**: Records transactions related to wallets.
-
 ## DATABASE Schema
 
 ### Users Table
@@ -195,6 +178,8 @@ export async function down(knex: Knex): Promise<void> {
 }
 
 ```
+
+## ER Diagram
 
 ![ER Diagram](./images/er-diagram.png)
 
