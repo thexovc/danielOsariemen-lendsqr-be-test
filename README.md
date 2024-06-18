@@ -459,8 +459,94 @@ Withdraws funds from the user's wallet.
       "message": "Insufficient balance"
     }
     ```
+---
+
+## Transactions Routes
+
+### GET /v1/transactions/single/:transactionId
+
+Retrieves a specific transaction by its ID.
+
+- **URL**: `/v1/transactions/single/:transactionId`
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **URL Parameters**:
+  - `transactionId` (string, required): The ID of the transaction to retrieve.
+- **Response**:
+  - **Success**: Returns the details of the transaction.
+    ```json
+    {
+      "id": 1,
+    "wallet_id": 1,
+    "user_id": 1,
+    "amount": 3000,
+    "type": "deposit",
+    "currency": "NGN",
+    "created_at": "2024-06-16T13:32:53.000Z",
+    "updated_at": "2024-06-16T13:32:53.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the transaction is not found.
+    ```json
+    {
+      "statusCode": 404,
+      "message": "Transaction not found"
+    }
+    ```
+
+### GET /v1/transactions/user
+
+Retrieves all transactions for the logged-in user.
+
+- **URL**: `/v1/transactions/user`
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Query Parameters**:
+  - `limit` (number, optional): The number of transactions to return per page. Defaults to 10.
+  - `page` (number, optional): The page number to return. Defaults to 1.
+- **Response**:
+  - **Success**: Returns a list of transactions for the user.
+    ```json
+    {
+      "transactions": [
+        {
+          "id": "1",
+          "user_id": "1",
+          "amount": 100,
+          "currency": "NGN",
+          "type": "debit",
+          "status": "completed",
+          "createdAt": "2023-06-18T00:00:00.000Z",
+          "updatedAt": "2023-06-18T00:00:00.000Z"
+        },
+        {
+          "id": "2",
+          "user_id": "1",
+          "amount": 200,
+          "currency": "USD",
+          "type": "credit",
+          "status": "pending",
+          "createdAt": "2023-06-18T00:00:00.000Z",
+          "updatedAt": "2023-06-18T00:00:00.000Z"
+        }
+      ],
+      "total": 2,
+      "limit": 10,
+      "page": 1
+    }
+    ```
+  - **Error**: Returns an error message if the request fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
 
 ---
+
 
 ## Testing
 
