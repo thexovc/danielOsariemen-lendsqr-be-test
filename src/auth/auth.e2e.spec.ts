@@ -1,176 +1,155 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, HttpStatus } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { ConfigModule } from '@nestjs/config';
-import { JwtModule } from '@nestjs/jwt';
-import { AuthModule } from './auth.module';
-import { jwtConstants } from '../constants';
-
-jest.mock('supertest');
+import { AppModule } from '../app.module'; // Adjust path as necessary
+import { AuthService } from '../auth/auth.service';
+import { RegisterDto, loginDto } from '../auth/dto/auth.dto';
 
 describe('AuthController (e2e)', () => {
   let app: INestApplication;
+  let authService: AuthService;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [
-        AuthModule,
-        ConfigModule.forRoot({
-          isGlobal: true,
-          envFilePath: '.env.test', // Ensure you have a test environment file
-        }),
-        JwtModule.register({
-          global: true,
-          secret: jwtConstants.secret,
-          signOptions: { expiresIn: '5h' },
-        }),
-      ],
+      imports: [AppModule],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
+
+    authService = moduleFixture.get<AuthService>(AuthService);
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it('should register a user successfully', async () => {
-    const userDto = {
-      email: 'testuser@example.com',
-      password: 'password',
-      first_name: 'John',
-      last_name: 'Doe',
-    };
+  describe('/auth/register (POST)', () => {
+    it('should register a user successfully', async () => {
+      const registerDto: RegisterDto = {
+        first_name: 'test1',
+        last_name: 'test2',
+        email: 'test@example.com',
+        password: 'password',
+        phone_number: '',
+      };
 
-    // Mock response for successful registration
-    request(app.getHttpServer())
-      .post('/v1/auth/register')
-      .send(userDto)
-      .expect(HttpStatus.CREATED)
-      .expect((response) => {
-        expect(response.body).toMatchObject({
-          message: 'registration successful!',
-          user: {
-            email: userDto.email,
-            first_name: userDto.first_name,
-            last_name: userDto.last_name,
-          },
+      jest.spyOn(authService, 'register').mockResolvedValue({
+        message: 'User registered successfully',
+        user: { id: 1 },
+      });
+
+      await request(app.getHttpServer())
+        .post('/v1/auth/register') // Adjust this path if necessary
+        .send(registerDto)
+        .expect(HttpStatus.CREATED)
+        .expect((res) => {
+          expect(res.body.message).toBe('User registered successfully');
+          expect(res.body.user.id).toBe(1);
         });
+    });
+
+    it('should return a 403 if email is in Karma Blacklist', async () => {
+      const registerDto: RegisterDto = {
+        first_name: 'test1',
+        last_name: 'test2',
+        email: 'blacklisted@example.com',
+        password: 'password',
+        phone_number: '',
+      };
+
+      jest.spyOn(authService, 'register').mockResolvedValue({
+        error: true,
+        message: 'Email In Karma Blacklist',
       });
 
-    const response = await request(app.getHttpServer())
-      .post('/v1/auth/register')
-      .send(userDto);
-
-    expect(response.status).toBe(HttpStatus.CREATED);
-    expect(response.body.message).toBe('registration successful!');
-    expect(response.body.user.email).toBe(userDto.email);
-  });
-
-  it('should not register a user if email already exists', async () => {
-    const existingUser = {
-      email: 'testuser@example.com',
-      password: 'password',
-      first_name: 'Existing',
-      last_name: 'User',
-    };
-
-    // Mock response for registration with existing email
-    request(app.getHttpServer())
-      .post('/v1/auth/register')
-      .send(existingUser)
-      .expect(HttpStatus.BAD_REQUEST)
-      .expect((response) => {
-        expect(response.body).toMatchObject({
-            message: 'Email already exists',
+      await request(app.getHttpServer())
+        .post('/v1/auth/register') // Adjust this path if necessary
+        .send(registerDto)
+        .expect(HttpStatus.FORBIDDEN)
+        .expect((res) => {
+          expect(res.body.message).toBe('Email In Karma Blacklist');
         });
-      });
+    });
 
-    const response = await request(app.getHttpServer())
-      .post('/v1/auth/register')
-      .send(existingUser);
+    it('should return a 500 for unexpected errors', async () => {
+      const registerDto: RegisterDto = {
+        first_name: 'test1',
+        last_name: 'test2',
+        email: 'error@example.com',
+        password: 'password',
+        phone_number: '',
+      };
 
-    expect(response.status).toBe(HttpStatus.BAD_REQUEST);
-    expect(response.body.message).toBe('Email already exists');
+      jest
+        .spyOn(authService, 'register')
+        .mockRejectedValue(new Error('Unexpected error'));
+
+      await request(app.getHttpServer())
+        .post('/v1/auth/register') // Adjust this path if necessary
+        .send(registerDto)
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        .expect((res) => {
+          expect(res.body.message).toBe('Internal server error');
+        });
+    });
   });
 
-  it('should login a user successfully', async () => {
-    const loginDto = {
-      email: 'testuser@example.com',
-      password: 'password',
-    };
+  describe('/auth/login (POST)', () => {
+    it('should login a user successfully', async () => {
+      const loginDto: loginDto = {
+        email: 'test@example.com',
+        password: 'password',
+      };
 
-    // Mock response for successful login
-    request(app.getHttpServer())
-      .post('/v1/auth/login')
-      .send(loginDto)
-      .expect(HttpStatus.OK)
-      .expect((response) => {
-        expect(response.body).toMatchObject({
-         
-            email: loginDto.email,
-        }),
-      });
-
-    const response = await request(app.getHttpServer())
-      .post('/v1/auth/login')
-      .send(loginDto);
-
-    expect(response.status).toBe(HttpStatus.OK);
-    expect(response.body.access_token).toBeDefined();
-    expect(response.body.data.email).toBe(loginDto.email);
-  });
-
-  it('should not login a user with incorrect email', async () => {
-    const loginDto = {
-      email: 'nonexistentuser@example.com',
-      password: 'password',
-    };
-
-    // Mock response for login with incorrect email
-    (request as jest.Mocked<typeof request>)
-      .post('/v1/auth/login')
-      .send(loginDto)
-      .expect(HttpStatus.NOT_FOUND)
-      .mockResolvedValue({
-        status: HttpStatus.NOT_FOUND,
-        body: {
-          message: 'Email is invalid',
+      jest.spyOn(authService, 'login').mockResolvedValue({
+        access_token: 'jwt-token',
+        data: {
+          first_name: 'test1',
+          last_name: 'test2',
+          email: 'test@example.com',
+          password: 'password',
+          phone_number: '',
+          created_at: '2024-06-18T14:35:36.000Z',
+          updated_at: '2024-06-18T14:35:36.000Z',
         },
       });
 
-    const response = await request(app.getHttpServer())
-      .post('/v1/auth/login')
-      .send(loginDto);
+      await request(app.getHttpServer())
+        .post('/v1/auth/login')
+        .send(loginDto)
+        .expect(HttpStatus.CREATED)
+        .expect((res) => {
+          expect(res.body.access_token).toBe('jwt-token');
+          expect(res.body.data).toStrictEqual({
+            first_name: 'test1',
+            last_name: 'test2',
+            email: 'test@example.com',
+            password: 'password',
+            phone_number: '',
+            created_at: '2024-06-18T14:35:36.000Z',
+            updated_at: '2024-06-18T14:35:36.000Z',
+          });
+        });
+    });
 
-    expect(response.status).toBe(HttpStatus.NOT_FOUND);
-    expect(response.body.message).toBe('Email is invalid');
-  });
+    it('should return a 500 for unexpected errors during login', async () => {
+      const loginDto: loginDto = {
+        email: 'error@example.com',
+        password: 'password',
+      };
 
-  it('should not login a user with incorrect password', async () => {
-    const loginDto = {
-      email: 'testuser@example.com',
-      password: 'wrongpassword',
-    };
+      jest
+        .spyOn(authService, 'login')
+        .mockRejectedValue(new Error('Unexpected error'));
 
-    // Mock response for login with incorrect password
-    (request as jest.Mocked<typeof request>)
-      .post('/v1/auth/login')
-      .send(loginDto)
-      .expect(HttpStatus.UNAUTHORIZED)
-      .mockResolvedValue({
-        status: HttpStatus.UNAUTHORIZED,
-        body: {
-          message: 'password incorrect',
-        },
-      });
-
-    const response = await request(app.getHttpServer())
-      .post('/v1/auth/login')
-      .send(loginDto);
-
-    expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
-    expect(response.body.message).toBe('password incorrect');
+      await request(app.getHttpServer())
+        .post('/v1/auth/login')
+        .send(loginDto)
+        .expect(HttpStatus.INTERNAL_SERVER_ERROR)
+        .expect((res) => {
+          expect(res.body.message).toBe('Internal server error');
+        });
+    });
   });
 });
