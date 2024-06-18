@@ -407,6 +407,15 @@ Transfers funds from the user's wallet to another user's wallet.
       "updated_at": "2024-06-15T21:52:46.000Z"
     }
     ```
+- **Error**: Returns an error message if the user is not authenticated.
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+
   - **Error**: Returns an error message if the sender wallet is not found.
     ```json
     {
@@ -434,6 +443,7 @@ Withdraws funds from the user's wallet.
   - `amount` (number, required): The amount to withdraw. Must be a positive number.
   - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
 - **Response**:
+
   - **Success**: Returns the updated wallet object.
     ```json
     {
@@ -445,6 +455,16 @@ Withdraws funds from the user's wallet.
       "updated_at": "2024-06-17T18:00:09.000Z"
     }
     ```
+
+- **Error**: Returns an error message if the user is not authenticated.
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+
   - **Error**: Returns an error message if the wallet is not found.
     ```json
     {
@@ -459,6 +479,7 @@ Withdraws funds from the user's wallet.
       "message": "Insufficient balance"
     }
     ```
+
 ---
 
 ## Transactions Routes
@@ -474,17 +495,35 @@ Retrieves a specific transaction by its ID.
 - **URL Parameters**:
   - `transactionId` (string, required): The ID of the transaction to retrieve.
 - **Response**:
+
   - **Success**: Returns the details of the transaction.
     ```json
     {
       "id": 1,
-    "wallet_id": 1,
-    "user_id": 1,
-    "amount": 3000,
-    "type": "deposit",
-    "currency": "NGN",
-    "created_at": "2024-06-16T13:32:53.000Z",
-    "updated_at": "2024-06-16T13:32:53.000Z"
+      "wallet_id": 1,
+      "user_id": 1,
+      "amount": 3000,
+      "type": "deposit",
+      "currency": "NGN",
+      "created_at": "2024-06-16T13:32:53.000Z",
+      "updated_at": "2024-06-16T13:32:53.000Z"
+    }
+    ```
+
+- **Error**: Returns an error message if the user is not authenticated.
+
+  ```json
+  {
+    "statusCode": 401,
+    "message": "Unauthorized"
+  }
+  ```
+
+  - **Error**: Returns an error message if the user is not the owner of transaction.
+    ```json
+    {
+      "statusCode": 401,
+      "message": "User must be owner of transaction"
     }
     ```
   - **Error**: Returns an error message if the transaction is not found.
@@ -537,16 +576,8 @@ Retrieves all transactions for the logged-in user.
       "page": 1
     }
     ```
-  - **Error**: Returns an error message if the request fails.
-    ```json
-    {
-      "statusCode": 400,
-      "message": "Bad Request"
-    }
-    ```
 
 ---
-
 
 ## Testing
 

@@ -36,17 +36,29 @@ export class TransactionsService {
 
   async getAllTransactionsByUserId(
     userId: number,
-    limit: number,
-    page: number,
+    limit: number = 10,
+    page: number = 1,
   ) {
     const offset = (page - 1) * limit;
 
+    // Fetch transactions for the given user ID with pagination
     const transactions = await this.knex('transactions')
       .where('user_id', userId)
       .select('*')
       .limit(limit)
       .offset(offset);
 
-    return transactions;
+    // Count total number of transactions for the user
+    const total = await this.knex('transactions')
+      .where('user_id', userId)
+      .count('* as total')
+      .first();
+
+    return {
+      transactions,
+      total: total.total, // Extract the total count from the query result
+      limit,
+      page,
+    };
   }
 }
