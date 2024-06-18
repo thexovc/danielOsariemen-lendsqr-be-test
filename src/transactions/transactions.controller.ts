@@ -31,12 +31,13 @@ export class TransactionsController {
   @Get('user')
   async getAllTransactionsByUserId(
     @Request() req,
-    @Query() dto: GetTransactionsDto,
+    @Query(new ValidationPipe()) dto: GetTransactionsDto,
   ) {
-    return this.transactionsService.getAllTransactionsByUserId(
+    return this.transactionsService.getAllTransactionsByUserIdAndCurrency(
       req.user.id,
-      dto.limit,
-      dto.page,
+      dto?.currency,
+      Number(dto.limit),
+      Number(dto.page),
     );
   }
 }

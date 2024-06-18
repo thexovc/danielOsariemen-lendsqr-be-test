@@ -1,11 +1,18 @@
-import { IsNumber, IsOptional } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GetTransactionsDto {
   @IsOptional()
-  @IsNumber()
+  @IsString()
   limit: number;
 
   @IsOptional()
-  @IsNumber()
+  @IsString()
   page: number;
+
+  @IsEnum(['NGN', 'EUR', 'USD'], {
+    message:
+      "currency must be one of the following values: 'NGN', 'EUR', 'USD' ",
+  })
+  @IsNotEmpty()
+  currency: 'NGN' | 'EUR' | 'USD';
 }
