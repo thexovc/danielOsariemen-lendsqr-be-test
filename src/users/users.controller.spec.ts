@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { AuthGuard } from '../guard/auth.guard'; // Adjusted relative path
+import { AuthGuard } from '../guard/auth.guard';
 import { UpdateUserDto } from './dto/user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
 

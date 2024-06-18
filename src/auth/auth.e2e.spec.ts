@@ -1,7 +1,7 @@
 import { INestApplication, HttpStatus } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from '../app.module'; // Adjust path as necessary
+import { AppModule } from '../app.module';
 import { AuthService } from '../auth/auth.service';
 import { RegisterDto, loginDto } from '../auth/dto/auth.dto';
 
@@ -40,7 +40,7 @@ describe('AuthController (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .post('/v1/auth/register') // Adjust this path if necessary
+        .post('/v1/auth/register')
         .send(registerDto)
         .expect(HttpStatus.CREATED)
         .expect((res) => {
@@ -64,7 +64,7 @@ describe('AuthController (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .post('/v1/auth/register') // Adjust this path if necessary
+        .post('/v1/auth/register')
         .send(registerDto)
         .expect(HttpStatus.FORBIDDEN)
         .expect((res) => {
@@ -86,7 +86,7 @@ describe('AuthController (e2e)', () => {
         .mockRejectedValue(new Error('Unexpected error'));
 
       await request(app.getHttpServer())
-        .post('/v1/auth/register') // Adjust this path if necessary
+        .post('/v1/auth/register')
         .send(registerDto)
         .expect(HttpStatus.INTERNAL_SERVER_ERROR)
         .expect((res) => {

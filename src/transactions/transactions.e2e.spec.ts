@@ -1,8 +1,8 @@
 import { HttpStatus, INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as request from 'supertest';
-import { AppModule } from '../app.module'; // Adjust path as necessary
-import { TransactionsService } from './transactions.service'; // Adjust path as necessary
+import { AppModule } from '../app.module';
+import { TransactionsService } from './transactions.service';
 
 describe('TransactionsController (e2e)', () => {
   let app: INestApplication;
@@ -14,7 +14,7 @@ describe('TransactionsController (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe()); // Enable validation globally
+    app.useGlobalPipes(new ValidationPipe());
 
     await app.init();
 
