@@ -9,7 +9,7 @@
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
-- [API Endpoints](#api-endpoints)
+- [API Documentation](#api-documentation)
 - [Testing](#testing)
 - [License](#license)
 
@@ -92,7 +92,7 @@ To run the application locally:
 
 The application will be running on `http://localhost:3000`.
 
-# API Documentation
+## API Documentation
 
 ## Auth Routes
 
