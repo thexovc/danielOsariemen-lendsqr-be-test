@@ -82,7 +82,7 @@ To run the application locally:
 2. **Run migrations**:
 
    ```sh
-   npm run migration:run
+   npm run migration:latest
    ```
 
 3. **Start the application**:
@@ -92,30 +92,304 @@ To run the application locally:
 
 The application will be running on `http://localhost:3000`.
 
-## API Endpoints
+# API Documentation
 
-### Authentication
+## Auth Routes
 
-- **Register**: `POST /v1/auth/register`
-- **Login**: `POST /v1/auth/login`
+### POST /v1/auth/register
 
-### User Management
+Registers a new user.
 
-- **Get User**: `GET /v1/users`
-- **Update User**: `PUT /v1/users`
+- **URL**: `/v1/auth/register`
+- **Method**: `POST`
+- **Request Body**:
+  - `email` (string, required): The user's email address.
+  - `password` (string, required): The user's password.
+  - `firstName` (string, required): The user's first name.
+  - `lastName` (string, required): The user's last name.
 
-### Wallet Management
+- **Response**:
+  - **Success**: Returns the created user object.
+    ```json
+    {
+      "id": "1",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if email is in Karma blacklist.
+    ```json
+    {
+      "statusCode": 403,
+      "message": "Email In Karma Blacklist"
+    }
+    ```
+    ```
+  - **Error**: Returns an error message if email already registered.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Email already registered"
+    }
+    ```
 
-- **Get Wallet**: `GET /v1/wallet`
-- **Create Wallet**: `POST /v1/wallet/create`
-- **Fund Account**: `POST /v1/wallet/fund`
-- **Transfer Funds**: `POST /v1/wallet/transfer`
-- **Withdraw Funds**: `POST /v1/wallet/withdraw`
+### POST /v1/auth/login
 
-### Transaction Management
+Logs in an existing user.
 
-- **Get Transaction by ID**: `GET /v1/transactions/single/:transactionId`
-- **Get All Transactions by User**: `GET /v1/transactions/user`
+- **URL**: `/v1/auth/login`
+- **Method**: `POST`
+- **Request Body**:
+  - `email` (string, required): The user's email address.
+  - `password` (string, required): The user's password.
+
+- **Response**:
+  - **Success**: Returns an access token.
+    ```json
+    {
+      "accessToken": "jwt_token",
+       "data" : {
+                  "id": "1",
+                  "email": "user@example.com",
+                  "firstName": "John",
+                  "lastName": "Doe",
+                  "createdAt": "2023-06-18T00:00:00.000Z",
+                  "updatedAt": "2023-06-18T00:00:00.000Z"
+                }
+    }
+    ```
+  - **Error**: Returns an error message if the login fails.
+    ```json
+    {
+      "statusCode": 401,
+      "message": "Unauthorized"
+    }
+    ```
+
+---
+
+## User Routes
+
+### GET /v1/users
+
+Retrieves the details of the authenticated user.
+
+- **URL**: `/v1/users`
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Response**:
+  - **Success**: Returns the user details.
+    ```json
+    {
+      "id": "1",
+      "email": "user@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the user is not authenticated.
+    ```json
+    {
+      "statusCode": 401,
+      "message": "Unauthorized"
+    }
+    ```
+
+### PUT /v1/users
+
+Updates the details of the authenticated user.
+
+- **URL**: `/v1/users`
+- **Method**: `PUT`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Request Body**:
+  - `firstName` (string, optional): The user's first name.
+  - `lastName` (string, optional): The user's last name.
+  - `email` (string, optional): The user's email address.
+  - `password` (string, optional): The user's password.
+
+- **Response**:
+  - **Success**: Returns the updated user object.
+    ```json
+    {
+      "id": "1",
+      "email": "updated@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the update fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
+
+---
+
+
+## Wallet Routes
+
+### GET /v1/wallet
+
+Retrieves the details of the user's wallet.
+
+- **URL**: `/v1/wallet`
+- **Method**: `GET`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Query Parameters**:
+  - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
+- **Response**:
+  - **Success**: Returns the wallet details.
+    ```json
+    {
+      "id": "1",
+      "user_id": "1",
+      "balance": 1000,
+      "currency": "NGN",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the request fails.
+    ```json
+    {
+      "statusCode": 401,
+      "message": "Unauthorized"
+    }
+    ```
+
+### POST /v1/wallet/create
+
+Creates a new wallet for the user.
+
+- **URL**: `/v1/wallet/create`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Request Body**:
+  - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
+- **Response**:
+  - **Success**: Returns the created wallet object.
+    ```json
+    {
+      "id": "1",
+      "user_id": "1",
+      "balance": 0,
+      "currency": "NGN",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the creation fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
+
+### POST /v1/wallet/fund
+
+Funds the user's wallet.
+
+- **URL**: `/v1/wallet/fund`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Request Body**:
+  - `amount` (number, required): The amount to fund the wallet with. Must be a positive number.
+  - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
+- **Response**:
+  - **Success**: Returns the updated wallet object.
+    ```json
+    {
+      "id": "1",
+      "user_id": "1",
+      "balance": 1500,
+      "currency": "NGN",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the funding fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
+
+### POST /v1/wallet/transfer
+
+Transfers funds from the user's wallet to another user's wallet.
+
+- **URL**: `/v1/wallet/transfer`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Request Body**:
+  - `recipient_email` (string, required): The email of the recipient user.
+  - `amount` (number, required): The amount to transfer. Must be a positive number.
+  - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
+- **Response**:
+  - **Success**: Returns a success message.
+    ```json
+    {
+      "message": "Transfer successful"
+    }
+    ```
+  - **Error**: Returns an error message if the transfer fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
+
+### POST /v1/wallet/withdraw
+
+Withdraws funds from the user's wallet.
+
+- **URL**: `/v1/wallet/withdraw`
+- **Method**: `POST`
+- **Headers**:
+  - `Authorization` (string, required): Bearer token.
+- **Request Body**:
+  - `amount` (number, required): The amount to withdraw. Must be a positive number.
+  - `currency` (string, required): The currency of the wallet. Must be one of `NGN`, `EUR`, `USD`.
+- **Response**:
+  - **Success**: Returns the updated wallet object.
+    ```json
+    {
+      "id": "1",
+      "user_id": "1",
+      "balance": 500,
+      "currency": "NGN",
+      "createdAt": "2023-06-18T00:00:00.000Z",
+      "updatedAt": "2023-06-18T00:00:00.000Z"
+    }
+    ```
+  - **Error**: Returns an error message if the withdrawal fails.
+    ```json
+    {
+      "statusCode": 400,
+      "message": "Bad Request"
+    }
+    ```
+
+---
 
 ## Testing
 
