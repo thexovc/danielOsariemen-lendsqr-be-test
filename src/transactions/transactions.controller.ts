@@ -8,7 +8,7 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
-import { AuthGuard } from 'src/guard/auth.guard';
+import { AuthGuard } from '../guard/auth.guard';
 import { GetTransactionsDto } from './dto/transaction.dto';
 
 @Controller('v1/transactions')
