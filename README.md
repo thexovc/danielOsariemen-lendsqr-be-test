@@ -5,8 +5,8 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Technology Stack](#technology-stack)
-- [DATABASE Schema](#database-schema)
 - [ER Diagram](#er-diagram)
+- [DATABASE Schema](#database-schema)
 - [Installation](#installation)
 - [Environment Variables](#environment-variables)
 - [Running the Application](#running-the-application)
@@ -94,7 +94,24 @@ To run the application locally:
    npm run start:dev
    ```
 
-The application will be running on `http://localhost:3000`.
+The application will be running on `http://localhost:5000`.
+
+## ER Diagram
+
+![ER Diagram](./er-diagram.png)
+
+In this diagram:
+
+- A user can have multiple wallets.
+- Each wallet belongs to a single user.
+- A wallet can have multiple transactions.
+- Each transaction is associated with a single wallet.
+
+The ER diagram illustrates the relationships between the tables:
+
+- **Users**: Stores user information.
+- **Wallets**: Each wallet belongs to a user.
+- **Transactions**: Records transactions related to wallets.
 
 ## DATABASE Schema
 
@@ -178,23 +195,6 @@ export async function down(knex: Knex): Promise<void> {
 }
 
 ```
-
-## ER Diagram
-
-![ER Diagram](./er-diagram.png)
-
-In this diagram:
-
-- A user can have multiple wallets.
-- Each wallet belongs to a single user.
-- A wallet can have multiple transactions.
-- Each transaction is associated with a single wallet.
-
-The ER diagram illustrates the relationships between the tables:
-
-- **Users**: Stores user information.
-- **Wallets**: Each wallet belongs to a user.
-- **Transactions**: Records transactions related to wallets.
 
 ## API Documentation
 
