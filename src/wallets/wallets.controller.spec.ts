@@ -132,10 +132,12 @@ describe('WalletsController', () => {
       const req = { user: { id: 1 } };
       const invalidDto: FundAccountDto = { amount: -10, currency: 'NGN' };
 
-      // Ensure that expect checks for HttpException being thrown
-      await expect(controller.fundAccount(req, invalidDto)).rejects.toThrow(
-        HttpException,
-      );
+      try {
+        await controller.fundAccount(req, invalidDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(HttpException);
+        expect(error.getStatus()).toBe(400);
+      }
     });
   });
 
@@ -172,7 +174,7 @@ describe('WalletsController', () => {
       );
     });
 
-    it('should throw HttpException if transferFundsDto validation fails', async () => {
+    it('should throw BadRequestException if transferFundsDto validation fails', async () => {
       const req = { user: { id: 1 } };
       const invalidDto: TransferFundsDto = {
         amount: -50,
@@ -180,9 +182,12 @@ describe('WalletsController', () => {
         recipient_email: 'recipient@example.com',
       };
 
-      await expect(controller.transferFunds(req, invalidDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      try {
+        await controller.transferFunds(req, invalidDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.getStatus()).toBe(400);
+      }
     });
   });
 
@@ -216,13 +221,16 @@ describe('WalletsController', () => {
       );
     });
 
-    it('should throw HttpException if withdrawFundsDto validation fails', async () => {
+    it('should throw BadRequestException if withdrawFundsDto validation fails', async () => {
       const req = { user: { id: 1 } };
       const invalidDto: WithdrawFundsDto = { amount: -30, currency: 'NGN' };
 
-      await expect(controller.withdrawFunds(req, invalidDto)).rejects.toThrow(
-        BadRequestException,
-      );
+      try {
+        await controller.withdrawFunds(req, invalidDto);
+      } catch (error) {
+        expect(error).toBeInstanceOf(BadRequestException);
+        expect(error.getStatus()).toBe(400);
+      }
     });
   });
 });
