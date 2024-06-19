@@ -71,11 +71,13 @@ Create a `.env` file in the root directory and add the following variables:
 DATABASE_HOST=localhost
 DATABASE_PORT=5432
 DATABASE_USER=your_db_user
-DATABASE_PASS=your_db_password
+DB_PASSWORD=your_db_password
 DATABASE_NAME=your_db_name
 JWT_SECRET=your_jwt_secret
 ADJUTOR_SECRET=your_adjutor_secret
 ADJUTOR_BASE_URL=adjutor_base_url
+NODE_ENV=development || production
+PORT=5000
 ```
 
 ## Running the Application

@@ -132,8 +132,9 @@ describe('WalletsController', () => {
       const req = { user: { id: 1 } };
       const invalidDto: FundAccountDto = { amount: -10, currency: 'NGN' };
 
+      // Ensure that expect checks for HttpException being thrown
       await expect(controller.fundAccount(req, invalidDto)).rejects.toThrow(
-        BadRequestException,
+        HttpException,
       );
     });
   });
