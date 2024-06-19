@@ -4,8 +4,8 @@ export declare class WalletsController {
     private readonly walletsService;
     constructor(walletsService: WalletsService);
     getWallet(req: any, queryData: GetWalletDto): Promise<any>;
-    createWallet(req: any, bodyData: CreateWalletDto): Promise<any>;
-    fundAccount(req: any, fundAccountDto: FundAccountDto): Promise<any>;
-    transferFunds(req: any, transferFundsDto: TransferFundsDto): Promise<any>;
-    withdrawFunds(req: any, withdrawFundsDto: WithdrawFundsDto): Promise<any>;
+    createWallet(req: any, bodyData: CreateWalletDto): Promise<import("./entity/wallet.entity").WalletEntity>;
+    fundAccount(req: any, fundAccountDto: FundAccountDto): Promise<import("./entity/wallet.entity").WalletEntity>;
+    transferFunds(req: any, transferFundsDto: TransferFundsDto): Promise<import("../transactions/entity/transactions.entity").TransactionEntity>;
+    withdrawFunds(req: any, withdrawFundsDto: WithdrawFundsDto): Promise<import("../transactions/entity/transactions.entity").TransactionEntity>;
 }

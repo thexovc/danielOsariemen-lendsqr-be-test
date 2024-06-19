@@ -15,27 +15,40 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransactionsService = void 0;
 const common_1 = require("@nestjs/common");
 const knex_1 = require("knex");
+const transactions_entity_1 = require("./entity/transactions.entity");
+const class_transformer_1 = require("class-transformer");
 let TransactionsService = class TransactionsService {
     constructor(knex) {
         this.knex = knex;
     }
     async getTransactionById(userId, transactionId) {
-        const transaction = await this.knex('transactions')
-            .where('user_id', userId)
-            .andWhere('id', transactionId)
-            .select('*')
-            .first();
-        if (!transaction) {
-            const exstTrx = await this.knex('transactions')
+        try {
+            const exiTrx = await this.knex('transactions')
                 .where('id', transactionId)
                 .select('*')
                 .first();
-            if (exstTrx) {
-                throw new common_1.HttpException('User must be owner of transaction', common_1.HttpStatus.UNAUTHORIZED);
+            if (!exiTrx) {
+                throw new common_1.HttpException('Transaction not found', common_1.HttpStatus.NOT_FOUND);
             }
-            throw new common_1.HttpException('Transaction not found', common_1.HttpStatus.NOT_FOUND);
+            const transaction = await this.knex('transactions')
+                .join('wallets', 'transactions.wallet_id', 'wallets.id')
+                .where({
+                'transactions.id': transactionId,
+                'wallets.user_id': userId,
+            })
+                .select('transactions.*')
+                .first();
+            if (!transaction) {
+                throw new common_1.HttpException('User must be owner of transaction', common_1.HttpStatus.NOT_FOUND);
+            }
+            return (0, class_transformer_1.plainToClass)(transactions_entity_1.TransactionEntity, transaction);
         }
-        return transaction;
+        catch (error) {
+            if (error instanceof common_1.HttpException) {
+                throw error;
+            }
+            throw new common_1.HttpException('Internal server error', common_1.HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
     async getAllTransactionsByUserIdAndCurrency(userId, currency, limit = 10, page = 1) {
         const offset = (page - 1) * limit;

@@ -14,6 +14,8 @@ import { Knex } from 'knex';
 import { JwtService } from '@nestjs/jwt';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { plainToClass } from 'class-transformer';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -50,9 +52,7 @@ export class AuthService {
 
     const access_token = await this.jwtService.signAsync({ ...existingUser });
 
-    const { password, ...rest } = existingUser;
-
-    return { access_token, data: rest };
+    return { access_token, data: plainToClass(UserEntity, existingUser) };
   }
 
   //   register
@@ -107,7 +107,7 @@ export class AuthService {
 
       return {
         message: 'registration successful!',
-        user: newUser,
+        user: plainToClass(UserEntity, newUser),
       };
     }
   }

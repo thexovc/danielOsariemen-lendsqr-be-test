@@ -7,6 +7,9 @@ import {
   TransferFundsDto,
   WithdrawFundsDto,
 } from './dto/wallets.dto';
+import { WalletEntity } from './entity/wallet.entity';
+import { plainToClass } from 'class-transformer';
+import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
 
 @Injectable()
 export class WalletsService {
@@ -30,7 +33,7 @@ export class WalletsService {
   async createWallet(
     user_id: number,
     createWalletDto: CreateWalletDto,
-  ): Promise<any> {
+  ): Promise<WalletEntity> {
     const existingWallet = await this.knex('wallets')
       .where({
         user_id,
@@ -50,10 +53,17 @@ export class WalletsService {
       currency: createWalletDto.currency,
     });
 
-    return await this.knex('wallets').where({ id: walletId }).first();
+    const newWallet = await this.knex('wallets')
+      .where({ id: walletId })
+      .first();
+
+    return plainToClass(WalletEntity, newWallet);
   }
 
-  async fundAccount(user_id: number, updateWalletDto: FundAccountDto) {
+  async fundAccount(
+    user_id: number,
+    updateWalletDto: FundAccountDto,
+  ): Promise<WalletEntity> {
     const wallet = await this.knex('wallets')
       .where({
         user_id,
@@ -82,15 +92,20 @@ export class WalletsService {
       });
     });
 
-    return await this.knex('wallets')
+    const uptWallet = await this.knex('wallets')
       .where({
         user_id,
         currency: updateWalletDto.currency,
       })
       .first();
+
+    return plainToClass(WalletEntity, uptWallet);
   }
 
-  async transferFunds(userId: number, transferData: TransferFundsDto) {
+  async transferFunds(
+    userId: number,
+    transferData: TransferFundsDto,
+  ): Promise<TransactionEntity> {
     const senderWallet = await this.knex('wallets')
       .join('users', 'wallets.user_id', 'users.id')
       .where('users.id', userId)
@@ -168,10 +183,13 @@ export class WalletsService {
       .where('id', senderTrxId)
       .first();
 
-    return sendTransac;
+    return plainToClass(TransactionEntity, sendTransac);
   }
 
-  async withdraw(userId: number, withdrawalDto: WithdrawFundsDto) {
+  async withdraw(
+    userId: number,
+    withdrawalDto: WithdrawFundsDto,
+  ): Promise<TransactionEntity> {
     const { amount, currency } = withdrawalDto;
 
     // Check if wallet exists for the user and currency
@@ -207,6 +225,6 @@ export class WalletsService {
       return trx('transactions').where({ id: newTrx[0] }).first();
     });
 
-    return updatedWallet;
+    return plainToClass(TransactionEntity, updatedWallet);
   }
 }

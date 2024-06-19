@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WalletsService = void 0;
 const common_1 = require("@nestjs/common");
 const knex_1 = require("knex");
+const wallet_entity_1 = require("./entity/wallet.entity");
+const class_transformer_1 = require("class-transformer");
+const transactions_entity_1 = require("../transactions/entity/transactions.entity");
 let WalletsService = class WalletsService {
     constructor(knex) {
         this.knex = knex;
@@ -42,7 +45,10 @@ let WalletsService = class WalletsService {
             user_id,
             currency: createWalletDto.currency,
         });
-        return await this.knex('wallets').where({ id: walletId }).first();
+        const newWallet = await this.knex('wallets')
+            .where({ id: walletId })
+            .first();
+        return (0, class_transformer_1.plainToClass)(wallet_entity_1.WalletEntity, newWallet);
     }
     async fundAccount(user_id, updateWalletDto) {
         const wallet = await this.knex('wallets')
@@ -67,12 +73,13 @@ let WalletsService = class WalletsService {
                 currency: updateWalletDto.currency,
             });
         });
-        return await this.knex('wallets')
+        const uptWallet = await this.knex('wallets')
             .where({
             user_id,
             currency: updateWalletDto.currency,
         })
             .first();
+        return (0, class_transformer_1.plainToClass)(wallet_entity_1.WalletEntity, uptWallet);
     }
     async transferFunds(userId, transferData) {
         const senderWallet = await this.knex('wallets')
@@ -129,7 +136,7 @@ let WalletsService = class WalletsService {
         const sendTransac = await this.knex('transactions')
             .where('id', senderTrxId)
             .first();
-        return sendTransac;
+        return (0, class_transformer_1.plainToClass)(transactions_entity_1.TransactionEntity, sendTransac);
     }
     async withdraw(userId, withdrawalDto) {
         const { amount, currency } = withdrawalDto;
@@ -155,7 +162,7 @@ let WalletsService = class WalletsService {
             console.log({ newTrx });
             return trx('transactions').where({ id: newTrx[0] }).first();
         });
-        return updatedWallet;
+        return (0, class_transformer_1.plainToClass)(transactions_entity_1.TransactionEntity, updatedWallet);
     }
 };
 exports.WalletsService = WalletsService;

@@ -20,6 +20,8 @@ const knex_1 = require("knex");
 const jwt_1 = require("@nestjs/jwt");
 const rxjs_1 = require("rxjs");
 const axios_1 = require("@nestjs/axios");
+const class_transformer_1 = require("class-transformer");
+const user_entity_1 = require("../users/entities/user.entity");
 let AuthService = class AuthService {
     constructor(configService, jwtService, knex, httpService) {
         this.configService = configService;
@@ -42,8 +44,7 @@ let AuthService = class AuthService {
             throw new common_1.HttpException('password incorrect', common_1.HttpStatus.UNAUTHORIZED);
         }
         const access_token = await this.jwtService.signAsync({ ...existingUser });
-        const { password, ...rest } = existingUser;
-        return { access_token, data: rest };
+        return { access_token, data: (0, class_transformer_1.plainToClass)(user_entity_1.UserEntity, existingUser) };
     }
     async register(createUserData) {
         const existingUser = await this.knex('users')
@@ -79,7 +80,7 @@ let AuthService = class AuthService {
             const newUser = await this.knex('users').where('id', userId).first();
             return {
                 message: 'registration successful!',
-                user: newUser,
+                user: (0, class_transformer_1.plainToClass)(user_entity_1.UserEntity, newUser),
             };
         }
     }

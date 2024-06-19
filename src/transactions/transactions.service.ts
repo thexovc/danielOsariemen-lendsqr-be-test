@@ -1,5 +1,7 @@
 import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
 import { Knex } from 'knex';
+import { TransactionEntity } from './entity/transactions.entity';
+import { plainToClass } from 'class-transformer';
 
 @Injectable()
 export class TransactionsService {
@@ -8,68 +10,48 @@ export class TransactionsService {
     private readonly knex: Knex,
   ) {}
 
-  async getTransactionById(userId: number, transactionId: number) {
-    const transaction = await this.knex('transactions')
-      .where('user_id', userId)
-      .andWhere('id', transactionId)
-      .select('*')
-      .first();
-
-    if (!transaction) {
-      const exstTrx = await this.knex('transactions')
+  async getTransactionById(
+    userId: number,
+    transactionId: number,
+  ): Promise<TransactionEntity> {
+    try {
+      // Check if the transaction exists
+      const exiTrx = await this.knex('transactions')
         .where('id', transactionId)
         .select('*')
         .first();
 
-      if (exstTrx) {
+      if (!exiTrx) {
+        throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);
+      }
+
+      const transaction = await this.knex('transactions')
+        .join('wallets', 'transactions.wallet_id', 'wallets.id')
+        .where({
+          'transactions.id': transactionId,
+          'wallets.user_id': userId,
+        })
+        .select('transactions.*')
+        .first();
+
+      if (!transaction) {
         throw new HttpException(
           'User must be owner of transaction',
-          HttpStatus.UNAUTHORIZED,
+          HttpStatus.NOT_FOUND,
         );
       }
 
-      throw new HttpException('Transaction not found', HttpStatus.NOT_FOUND);
+      return plainToClass(TransactionEntity, transaction);
+    } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    return transaction;
   }
-
-  // async getAllTransactionsByUserId(
-  //   userId: number,
-  //   limit: number = 10,
-  //   page: number = 1,
-  // ) {
-  //   const offset = (page - 1) * limit;
-
-  //   // Fetch transactions for the given user ID with pagination
-  //   const transactions = await this.knex('transactions as t')
-  //     .select(
-  //       't.id',
-  //       't.amount',
-  //       't.type',
-  //       't.currency',
-  //       't.created_at',
-  //       't.updated_at',
-  //     )
-  //     .join('wallets as w', 't.wallet_id', 'w.id')
-  //     .where('w.user_id', userId)
-  //     .limit(limit)
-  //     .offset(offset);
-
-  //   // Count total number of transactions for the user
-  //   const total = await this.knex('transactions as t')
-  //     .join('wallets as w', 't.wallet_id', 'w.id')
-  //     .where('w.user_id', userId)
-  //     .count('* as total')
-  //     .first();
-
-  //   return {
-  //     transactions,
-  //     total: total.total, // Extract the total count from the query result
-  //     limit,
-  //     page,
-  //   };
-  // }
 
   async getAllTransactionsByUserIdAndCurrency(
     userId: number,

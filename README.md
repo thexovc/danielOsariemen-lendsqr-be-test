@@ -182,7 +182,7 @@ export async function down(knex: Knex): Promise<void> {
 
 ## ER Diagram
 
-![ER Diagram](./images/er-diagram.png)
+![ER Diagram](./er-diagram.png)
 
 In this diagram:
 

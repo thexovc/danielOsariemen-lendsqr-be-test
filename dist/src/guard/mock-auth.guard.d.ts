@@ -1,4 +1,5 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
-export declare class MockAuthGuard implements CanActivate {
-    canActivate(context: ExecutionContext): boolean;
+import { NestMiddleware } from '@nestjs/common';
+import { Request, Response, NextFunction } from 'express';
+export declare class MockAuthMiddleware implements NestMiddleware {
+    use(req: Request, res: Response, next: NextFunction): void;
 }

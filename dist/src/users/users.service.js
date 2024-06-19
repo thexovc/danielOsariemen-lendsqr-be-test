@@ -15,6 +15,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
 const knex_1 = require("knex");
+const class_transformer_1 = require("class-transformer");
+const user_entity_1 = require("./entities/user.entity");
 let UsersService = class UsersService {
     constructor(knex) {
         this.knex = knex;
@@ -24,7 +26,7 @@ let UsersService = class UsersService {
         if (!userInfo) {
             throw new common_1.HttpException('User does not exist', common_1.HttpStatus.NOT_FOUND);
         }
-        return userInfo;
+        return (0, class_transformer_1.plainToClass)(user_entity_1.UserEntity, userInfo);
     }
     async updateUser(user_id, uptUser) {
         const userInfo = await this.knex('users').where({ id: user_id }).first();
@@ -34,7 +36,8 @@ let UsersService = class UsersService {
         if (Object.keys(uptUser).length != 0) {
             await this.knex('users').where('id', user_id).update(uptUser);
         }
-        return await this.knex('users').where({ id: user_id }).first();
+        const updatedUser = await this.knex('users').where({ id: user_id }).first();
+        return (0, class_transformer_1.plainToClass)(user_entity_1.UserEntity, updatedUser);
     }
 };
 exports.UsersService = UsersService;
