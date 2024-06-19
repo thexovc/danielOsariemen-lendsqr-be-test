@@ -9,7 +9,7 @@ import {
 } from './dto/wallets.dto';
 import { WalletEntity } from './entity/wallet.entity';
 import { plainToClass } from 'class-transformer';
-import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
+import { TransactionEntity } from '../transactions/entity/transactions.entity';
 
 @Injectable()
 export class WalletsService {

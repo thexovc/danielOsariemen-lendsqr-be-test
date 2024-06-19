@@ -9,7 +9,9 @@ import {
   TransferFundsDto,
   WithdrawFundsDto,
 } from './dto/wallets.dto';
-import { HttpException } from '@nestjs/common';
+import { BadRequestException, HttpException } from '@nestjs/common';
+import { TransactionEntity } from 'src/transactions/entity/transactions.entity';
+import { WalletEntity } from './entity/wallet.entity';
 
 describe('WalletsController', () => {
   let controller: WalletsController;
@@ -74,13 +76,13 @@ describe('WalletsController', () => {
       const userId = 1;
       const createWalletDto: CreateWalletDto = { currency: 'NGN' };
 
-      const expectedResult = {
+      const expectedResult: WalletEntity = {
         id: 1,
         user_id: 1,
         balance: 0,
         currency: 'NGN',
-        created_at: '2024-06-15T20:59:12.000Z',
-        updated_at: '2024-06-15T20:59:12.000Z',
+        created_at: undefined,
+        updated_at: undefined,
       };
       jest
         .spyOn(walletsService, 'createWallet')
@@ -103,13 +105,13 @@ describe('WalletsController', () => {
       const userId = 1;
       const fundAccountDto: FundAccountDto = { amount: 100, currency: 'NGN' };
 
-      const expectedResult = {
-        id: 1,
-        user_id: 1,
+      const expectedResult: WalletEntity = {
+        id: 3,
+        user_id: 0,
         balance: 100,
         currency: 'NGN',
-        created_at: '2024-06-15T20:59:12.000Z',
-        updated_at: '2024-06-15T20:59:12.000Z',
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       jest
@@ -131,7 +133,7 @@ describe('WalletsController', () => {
       const invalidDto: FundAccountDto = { amount: -10, currency: 'NGN' };
 
       await expect(controller.fundAccount(req, invalidDto)).rejects.toThrow(
-        HttpException,
+        BadRequestException,
       );
     });
   });
@@ -145,14 +147,14 @@ describe('WalletsController', () => {
         recipient_email: 'recipient@example.com',
       };
 
-      const expectedResult = {
+      const expectedResult: TransactionEntity = {
         id: 1,
         wallet_id: 1,
-        amount: -50,
-        type: 'transfer',
+        amount: 50,
+        type: 'deposit',
         currency: 'NGN',
-        created_at: '2024-06-15T21:52:46.000Z',
-        updated_at: '2024-06-15T21:52:46.000Z',
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       jest
@@ -178,7 +180,7 @@ describe('WalletsController', () => {
       };
 
       await expect(controller.transferFunds(req, invalidDto)).rejects.toThrow(
-        HttpException,
+        BadRequestException,
       );
     });
   });
@@ -191,13 +193,14 @@ describe('WalletsController', () => {
         currency: 'NGN',
       };
 
-      const expectedResult = {
+      const expectedResult: TransactionEntity = {
         id: 1,
-        user_id: 1,
-        balance: 30,
         currency: 'NGN',
-        created_at: '2024-06-17T18:00:09.000Z',
-        updated_at: '2024-06-17T18:00:09.000Z',
+        wallet_id: 1,
+        amount: 30,
+        type: 'withdrawal',
+        created_at: new Date(),
+        updated_at: new Date(),
       };
 
       jest.spyOn(walletsService, 'withdraw').mockResolvedValue(expectedResult);
@@ -217,7 +220,7 @@ describe('WalletsController', () => {
       const invalidDto: WithdrawFundsDto = { amount: -30, currency: 'NGN' };
 
       await expect(controller.withdrawFunds(req, invalidDto)).rejects.toThrow(
-        HttpException,
+        BadRequestException,
       );
     });
   });

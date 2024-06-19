@@ -4,6 +4,7 @@ import { UsersService } from './users.service';
 import { AuthGuard } from '../guard/auth.guard';
 import { UpdateUserDto } from './dto/user.dto';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { UserEntity } from './entities/user.entity';
 
 describe('UsersController', () => {
   let usersController: UsersController;
@@ -32,12 +33,15 @@ describe('UsersController', () => {
 
   describe('getUser', () => {
     it('should return user details', async () => {
-      const user = {
+      const user: UserEntity = {
         id: 1,
         email: 'test@example.com',
         first_name: 'Test',
         last_name: 'User',
         phone_number: '1234567890',
+        password: '',
+        created_at: undefined,
+        updated_at: undefined,
       };
       jest.spyOn(usersService, 'getUser').mockResolvedValue(user);
 
@@ -66,7 +70,17 @@ describe('UsersController', () => {
         last_name: 'User',
         phone_number: '0987654321',
       };
-      const updatedUser = { id: 1, ...updateUserDto };
+
+      const updatedUser: UserEntity = {
+        id: 1,
+        first_name: 'Updated',
+        last_name: 'User',
+        phone_number: '0987654321',
+        email: '',
+        password: '',
+        created_at: undefined,
+        updated_at: undefined,
+      };
       jest.spyOn(usersService, 'updateUser').mockResolvedValue(updatedUser);
 
       const req = { user: { id: 1 } };

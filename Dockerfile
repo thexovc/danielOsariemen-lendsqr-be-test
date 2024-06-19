@@ -1,15 +1,20 @@
-FROM node:18.15
+# Use the official Node.js 18 image as the base
+FROM node:18-alpine
 
-WORKDIR /app
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-COPY package.json .
-RUN yarn
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-# Build the application
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code
 COPY . .
-RUN yarn build
 
-# Expose port 3000 for the backend application
-EXPOSE 3000
+# Expose the port your app runs on
+EXPOSE 5000
 
-CMD ["yarn", "start:prod"]
+# Run the app
+CMD ["npm", "run", "start:prod"]

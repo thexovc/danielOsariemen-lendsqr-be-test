@@ -15,7 +15,7 @@ import { JwtService } from '@nestjs/jwt';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
 import { plainToClass } from 'class-transformer';
-import { UserEntity } from 'src/users/entities/user.entity';
+import { UserEntity } from '../users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
