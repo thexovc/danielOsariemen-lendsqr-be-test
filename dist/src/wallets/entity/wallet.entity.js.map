@@ -1,0 +1,1 @@
+{"version":3,"file":"wallet.entity.js","sourceRoot":"","sources":["../../../../src/wallets/entity/wallet.entity.ts"],"names":[],"mappings":";;;;;;;;;;;;AAAA,yDAA2C;AAGpC,IAAM,YAAY,GAAlB,MAAM,YAAY;IAQvB,YAAY,OAA8B;QACxC,MAAM,CAAC,MAAM,CAAC,IAAI,EAAE,OAAO,CAAC,CAAC;IAC/B,CAAC;CACF,CAAA;AAXY,oCAAY;uBAAZ,YAAY;IADxB,IAAA,0BAAM,GAAE;;GACI,YAAY,CAWxB"}
