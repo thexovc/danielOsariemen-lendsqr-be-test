@@ -1,4 +1,4 @@
-# Demo Credit Wallet Service
+# Demo Wallet Service - lendsqr BE test
 
 ## Table of Contents
 
@@ -20,9 +20,9 @@
 
 ## Introduction
 
-**Demo Credit Wallet Service**
+**Demo Wallet Service**
 
-The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to provide essential wallet functionalities for a mobile lending app. This project simulates a backend service where users can manage their financial transactions seamlessly. It is built using NodeJS with TypeScript, leveraging the KnexJS ORM for database interactions with a MySQL database.
+This Demo Wallet Service is an MVP (Minimum Viable Product) designed to provide essential wallet functionalities for a mobile lending app. This project simulates a backend service where users can manage their financial transactions seamlessly. It is built using NodeJS with TypeScript, leveraging the KnexJS ORM for database interactions with a MySQL database.
 
 **Features:**
 
@@ -32,12 +32,9 @@ The Demo Credit Wallet Service is an MVP (Minimum Viable Product) designed to pr
 4. **Withdraw Funds:** Users can withdraw funds from their wallet.
 5. **Blacklist Verification:** Users listed in the Lendsqr Adjutor Karma blacklist are prevented from creating an account.
 
-## Features
+### Here is a link to a Google Doc that provides more details about my implementation. -
 
-- **User Authentication**: Registration and login using JWT.
-- **Wallet Management**: Create, fund, transfer, and withdraw from wallets.
-- **Transaction Management**: Retrieve transactions by ID or user.
-- **Security**: Secured endpoints using JWT and authorization guards.
+https://docs.google.com/document/d/1OV6G0hjnvWMTg64JrbFBRrI0p8mPkYhuFhP-O19CNwM/edit?usp=sharing
 
 ## Technology Stack
 
@@ -207,7 +204,7 @@ The ER diagram illustrates the relationships between the tables:
 
 Registers a new user.
 
-- **URL**: `/v1/auth/register`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/auth/register`
 - **Method**: `POST`
 - **Request Body**:
 
@@ -254,7 +251,7 @@ Registers a new user.
 
 Logs in an existing user.
 
-- **URL**: `/v1/auth/login`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/auth/login`
 - **Method**: `POST`
 - **Request Body**:
 
@@ -292,7 +289,7 @@ Logs in an existing user.
 
 Retrieves the details of the authenticated user.
 
-- **URL**: `/v1/users`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/users`
 - **Method**: `GET`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -320,7 +317,7 @@ Retrieves the details of the authenticated user.
 
 Updates the details of the authenticated user.
 
-- **URL**: `/v1/users`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/users`
 - **Method**: `PUT`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -359,7 +356,7 @@ Updates the details of the authenticated user.
 
 Retrieves the details of the user's wallet.
 
-- **URL**: `/v1/wallet`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/wallet`
 - **Method**: `GET`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -396,7 +393,7 @@ Retrieves the details of the user's wallet.
 
 Creates a new wallet for the user.
 
-- **URL**: `/v1/wallet/create`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/wallet/create`
 - **Method**: `POST`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -451,7 +448,7 @@ Creates a new wallet for the user.
 
 Funds the user's wallet.
 
-- **URL**: `/v1/wallet/fund`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/wallet/fund`
 - **Method**: `POST`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -493,7 +490,7 @@ Funds the user's wallet.
 
 Transfers funds from the user's wallet to another user's wallet.
 
-- **URL**: `/v1/wallet/transfer`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/wallet/transfer`
 - **Method**: `POST`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -542,7 +539,7 @@ Transfers funds from the user's wallet to another user's wallet.
 
 Withdraws funds from the user's wallet.
 
-- **URL**: `/v1/wallet/withdraw`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/wallet/withdraw`
 - **Method**: `POST`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -596,7 +593,7 @@ Withdraws funds from the user's wallet.
 
 Retrieves a specific transaction by its ID.
 
-- **URL**: `/v1/transactions/single/:transactionId`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/transactions/single/:transactionId`
 - **Method**: `GET`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
@@ -646,7 +643,7 @@ Retrieves a specific transaction by its ID.
 
 Retrieves all transactions for the logged-in user.
 
-- **URL**: `/v1/transactions/user`
+- **URL**: `https://danielosariemen-lendsqr-be-test.up.railway.app/v1/transactions/user`
 - **Method**: `GET`
 - **Headers**:
   - `Authorization` (string, required): Bearer token.
